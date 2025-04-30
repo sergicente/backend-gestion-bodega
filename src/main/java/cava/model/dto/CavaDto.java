@@ -1,0 +1,16 @@
+package cava.model.dto;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CavaDto {
+    private String id;
+    private String nombre;
+    private int cantidad;
+    private String partida;
+}
