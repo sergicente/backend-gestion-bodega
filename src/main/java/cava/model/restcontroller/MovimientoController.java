@@ -23,6 +23,7 @@ import cava.model.entity.Material;
 import cava.model.entity.Movimiento;
 import cava.model.entity.Partida;
 import cava.model.entity.TipoMaterial;
+import cava.model.entity.TipoMovimiento;
 import cava.model.service.CavaService;
 import cava.model.service.MaterialService;
 import cava.model.service.MovimientoService;
@@ -50,7 +51,7 @@ public class MovimientoController {
     }
     
     
-    
+    // Obtener un movimiento
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
     	Movimiento movimiento = mservice.buscar(id);
@@ -61,7 +62,16 @@ public class MovimientoController {
     	}
     }
     
-	
+    // Obtener un movimiento
+    @GetMapping("/articulo/{id}")
+    public ResponseEntity<?> obtenerMovimientosDeUnArticulo(@PathVariable Long id) {
+    	List <Movimiento> movimientos = mservice.findByMaterialId(id);
+    	if(movimientos.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentran movimientos");
+    	}else {
+    		return ResponseEntity.ok(movimientos);
+    	}
+    }
     
     
     @DeleteMapping("/borrar/{id}")
@@ -76,15 +86,12 @@ public class MovimientoController {
     
     @PostMapping("/insertar")
     public ResponseEntity<?> insertarUno(@RequestBody MovimientoDto dto) {
-
         // Convertir DTO a entidad
         Movimiento movimiento = new Movimiento();
-        
         movimiento.setFecha(dto.getFecha());
         movimiento.setTipo(dto.getTipo());
         movimiento.setDescripcion(dto.getDescripcion());
         movimiento.setCantidad(dto.getCantidad());
-        
 
         if (dto.getPartidaId() != null) {
             Partida partida = pservice.buscar(dto.getPartidaId());
@@ -95,17 +102,35 @@ public class MovimientoController {
         }
 
         if (dto.getMaterialId() != null) {
-        	Material material =  matservice.buscar(dto.getMaterialId());
-            	 if (material == null) {
-            	        throw new EntityNotFoundException("No se encontró el material: " + dto.getMaterialId());
-            	    }
-            	    movimiento.setMaterial(material);
+            Material material = matservice.buscar(dto.getMaterialId());
+            if (material == null) {
+                throw new EntityNotFoundException("No se encontró el material: " + dto.getMaterialId());
+            }
 
+            switch (dto.getTipo()) {
+                case ENTRADA:
+                    material.setCantidad(material.getCantidad() + dto.getCantidad());
+                    break;
+                case SALIDA:
+                    int nuevaCantidad = material.getCantidad() - dto.getCantidad();
+                    if (nuevaCantidad < 0) {
+                        throw new IllegalArgumentException("No hay suficiente stock para realizar la salida");
+                    }
+                    material.setCantidad(nuevaCantidad);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Tipo de movimiento desconocido");
+            }
+
+            matservice.insertar(material);
+
+            movimiento.setMaterial(material);
         }
-        
-        // Guardar
+
+        // Guardar el movimiento
         movimiento = mservice.insertar(movimiento);
 
+        // Preparar DTO de respuesta
         MovimientoDto nuevoDto = new MovimientoDto();
         nuevoDto.setId(movimiento.getId());
         nuevoDto.setFecha(movimiento.getFecha());

@@ -55,4 +55,9 @@ public class MovimientoServiceImpl implements MovimientoService{
 		}
 	}
 
+	@Override
+	public List<Movimiento> findByMaterialId(Long id) {
+		return movrepo.findByMaterialId(id);
+	}
+
 }
