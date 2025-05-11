@@ -45,7 +45,7 @@ public class MaterialController {
     
     
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerUno(@PathVariable int id) {
+    public ResponseEntity<?> obtenerUno(@PathVariable long id) {
     	Material material = mservice.buscar(id);
     	if(material == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
@@ -61,7 +61,7 @@ public class MaterialController {
 
         // Convertir DTO a entidad
         Material material = new Material(
-                0, materialDto.getNombre(),
+                null, materialDto.getNombre(),
                 TipoMaterial.valueOf(materialDto.getTipo()),
                 materialDto.getObservaciones(),
                 materialDto.getCantidad()
@@ -85,7 +85,7 @@ public class MaterialController {
     
     
     @PutMapping("/modificar/{id}")
-    public ResponseEntity<?> modificar(@PathVariable int id, @RequestBody MaterialDto materialDto) {
+    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody MaterialDto materialDto) {
         try {
             // Comprobamos que el ID en la URL y en el body coincidan
             if (!(materialDto.getId() == id)) {
@@ -131,7 +131,7 @@ public class MaterialController {
     
     
     @DeleteMapping("/borrar/{id}")
-    public ResponseEntity<?> borrar(@PathVariable int id) {
+    public ResponseEntity<?> borrar(@PathVariable Long id) {
         Material existente = mservice.buscar(id);
         if (existente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el material con ID " + id);

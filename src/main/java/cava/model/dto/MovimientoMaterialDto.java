@@ -2,7 +2,7 @@ package cava.model.dto;
 
 import java.time.LocalDate;
 
-import cava.model.entity.TipoMovimiento;
+import cava.model.entity.TipoMovimientoMaterial;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,14 +10,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovimientoDto {
+public class MovimientoMaterialDto {
     private Long id;
     private LocalDate fecha;
-    private TipoMovimiento tipo;
+    private TipoMovimientoMaterial tipo;
     private String descripcion;
     private int cantidad;
-
-    private String partidaId;
-    private Integer materialId;
+    private Long materialId;
     
 }

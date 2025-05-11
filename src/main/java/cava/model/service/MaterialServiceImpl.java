@@ -20,7 +20,7 @@ public class MaterialServiceImpl implements MaterialService{
 	private MaterialRepository mrepo;
 
 	@Override
-	public Material buscar(Integer clave) {
+	public Material buscar(Long clave) {
 		return mrepo.findById(clave).orElse(null);
 
 	}
@@ -46,7 +46,7 @@ public class MaterialServiceImpl implements MaterialService{
 	}
 
 	@Override
-	public int borrar(Integer clave) {
+	public int borrar(Long clave) {
 		try {
 			if(mrepo.existsById(clave)) {
 				mrepo.deleteById(clave);

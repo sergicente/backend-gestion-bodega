@@ -47,7 +47,7 @@ public class MaterialCavaController {
 	}
 
 	@PostMapping("/{idCava}/{idMaterial}")
-	public ResponseEntity<?> asignarMaterial(@PathVariable String idCava, @PathVariable Integer idMaterial) {
+	public ResponseEntity<?> asignarMaterial(@PathVariable String idCava, @PathVariable long idMaterial) {
 	    try {
 	        // Buscar la cava
 	        Cava cava = cservice.buscar(idCava);

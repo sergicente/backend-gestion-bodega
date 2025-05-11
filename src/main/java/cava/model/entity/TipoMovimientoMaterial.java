@@ -1,8 +1,7 @@
 package cava.model.entity;
 
-public enum TipoMovimiento {
+public enum TipoMovimientoMaterial {
     ENTRADA,
     SALIDA,
     AJUSTE,
-    CAMBIO_ESTADO
 }

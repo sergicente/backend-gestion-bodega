@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Movimiento {
+public class MovimientoMaterial {
 	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,14 +26,9 @@ public class Movimiento {
 	private LocalDate fecha;
 	
     @Enumerated(EnumType.STRING)
-	private TipoMovimiento tipo;
+	private TipoMovimientoMaterial tipo;
 	private String descripcion;
 	private int cantidad;
-	
-    @ManyToOne
-    @JoinColumn(name = "partida_id")
-	private Partida partida;
-    
 
     @ManyToOne
     @JoinColumn(name = "material_id")
