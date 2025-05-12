@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import cava.model.dto.CavaDto;
 import cava.model.dto.MaterialDto;
 import cava.model.entity.Cava;
+import cava.model.entity.Marca;
 import cava.model.entity.Material;
 import cava.model.entity.Partida;
 import cava.model.entity.TipoMaterial;
@@ -63,6 +64,7 @@ public class MaterialController {
         Material material = new Material(
                 null, materialDto.getNombre(),
                 TipoMaterial.valueOf(materialDto.getTipo()),
+                Marca.valueOf(materialDto.getMarca()),
                 materialDto.getObservaciones(),
                 materialDto.getCantidad()
         );
@@ -75,6 +77,7 @@ public class MaterialController {
                 nuevoMaterial.getId(),
                 nuevoMaterial.getNombre(),
                 nuevoMaterial.getTipo().toString(),
+                nuevoMaterial.getMarca().toString(),
                 nuevoMaterial.getObservaciones(),
                 nuevoMaterial.getCantidad()
         );
@@ -103,6 +106,7 @@ public class MaterialController {
             material.setId(id);
             material.setNombre(materialDto.getNombre());
             material.setTipo(TipoMaterial.valueOf(materialDto.getTipo()));
+            material.setMarca(Marca.valueOf(materialDto.getMarca()));
             material.setObservaciones(materialDto.getObservaciones());
             material.setCantidad(materialDto.getCantidad());
 
@@ -114,6 +118,7 @@ public class MaterialController {
                     actualizado.getId(),
                     actualizado.getNombre(),
                     actualizado.getTipo().toString(),
+                    actualizado.getMarca().toString(),
                     actualizado.getObservaciones(),
                     actualizado.getCantidad()
             );

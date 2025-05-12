@@ -12,6 +12,7 @@ public class MaterialDto {
     private Long id;
     private String nombre;
     private String tipo;
+    private String marca;
     private String observaciones;
     private int cantidad;
 }

@@ -25,6 +25,9 @@ public class Material {
 
     @Enumerated(EnumType.STRING)
     private TipoMaterial tipo;
+    
+    @Enumerated(EnumType.STRING)
+    private Marca marca;
 
     private String observaciones;
     private int cantidad;

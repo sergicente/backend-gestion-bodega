@@ -91,72 +91,44 @@ public class MovimientoBotellaController {
 
         Partida partida = pservice.buscar(dto.getPartidaId());
         Cava cava = cservice.buscar(dto.getCavaId());
-        // Actualizar estado anterior (resta)
-        switch (dto.getEstadoAnterior()) {
-            case EN_RIMA:
-                int nuevaCantidadRima = partida.getBotellasRima() - dto.getCantidad();
-                if (nuevaCantidadRima < 0) {
-                    throw new IllegalArgumentException("No hay suficientes botellas en rima");
-                }
-                partida.setBotellasRima(nuevaCantidadRima);
-                break;
-
-            case EN_PUNTA:
-                int nuevaCantidadPunta = partida.getBotellasPunta() - dto.getCantidad();
-                if (nuevaCantidadPunta < 0) {
-                    throw new IllegalArgumentException("No hay suficientes botellas en punta");
-                }
-                partida.setBotellasPunta(nuevaCantidadPunta);
-                break;
-
-            default:
-                throw new IllegalArgumentException("Tipo de origen desconocido");
-        }
         
+        // Actualizar estado anterior (resta)
+        int nuevaCantidadRima = partida.getBotellasRima() - dto.getCantidad();
+        if (nuevaCantidadRima < 0) {
+            throw new IllegalArgumentException("No hay suficientes botellas en rima");
+        }
+        partida.setBotellasRima(nuevaCantidadRima);
         
 
         // Actualizar estado nuevo (suma)
-        switch (dto.getEstadoNuevo()) {
-            case DEGOLLADA:
-                partida.setBotellasDeguelladas(partida.getBotellasDeguelladas() + dto.getCantidad());
-                break;
 
-            case EN_STOCK:
-                partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
-                
-                // Restar materiales
-                
-                List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
-                for(MaterialCava mat : lista) {
-                	Material material = mat.getMaterial();
-                	int cantidadARestar = Math.round(mat.getCantidadNecesariaPorBotella() * dto.getCantidad());
-                	int nuevoStock = material.getCantidad() - cantidadARestar;
-                	if(nuevoStock < 0 ) {
-                		throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
-                	}
-                	material.setCantidad(nuevoStock);
-                	matservice.insertar(material);
-                	
-                	MovimientoMaterial mov = new MovimientoMaterial();
-                	mov.setFecha(dto.getFecha());
-                	mov.setTipo(TipoMovimientoMaterial.SALIDA);
-                	mov.setDescripcion("Uso de material en degüelle de " + dto.getCantidad() + " botellas de " + cava.getNombre());
-                	mov.setCantidad(cantidadARestar);
-                	mov.setMaterial(material);
-                	
-                	mmservice.insertar(mov);
-                	
-                }
-
-                
-                
-                
-                
-                break;
-
-            default:
-                throw new IllegalArgumentException("Tipo de destino desconocido");
+        partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
+        
+        // Restar materiales
+        
+        List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
+        for(MaterialCava mat : lista) {
+        	Material material = mat.getMaterial();
+        	int cantidadARestar = Math.round(mat.getCantidadNecesariaPorBotella() * dto.getCantidad());
+        	int nuevoStock = material.getCantidad() - cantidadARestar;
+        	if(nuevoStock < 0 ) {
+        		throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
+        	}
+        	material.setCantidad(nuevoStock);
+        	matservice.insertar(material);
+        	
+        	MovimientoMaterial mov = new MovimientoMaterial();
+        	mov.setFecha(dto.getFecha());
+        	mov.setTipo(TipoMovimientoMaterial.SALIDA);
+        	mov.setDescripcion("Uso de material en degüelle de " + dto.getCantidad() + " botellas de " + cava.getNombre());
+        	mov.setCantidad(cantidadARestar);
+        	mov.setMaterial(material);
+        	
+        	mmservice.insertar(mov);
+        	
+        
         }
+                
 
         pservice.insertar(partida);
 
