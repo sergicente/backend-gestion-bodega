@@ -5,11 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cava.model.entity.Jaula;
 import cava.model.entity.Material;
 import cava.model.entity.MaterialCava;
 import cava.model.entity.Partida;
-import cava.model.repository.JaulaRepository;
 import cava.model.repository.MaterialCavaRepository;
 import cava.model.repository.MaterialRepository;
 import cava.model.repository.PartidaRepository;
@@ -48,18 +46,10 @@ public class MaterialCavaServiceImpl implements MaterialCavaService{
 	}
 
 	@Override
-	public int borrar(Integer clave) {
-		try {
-			if(mcrepo.existsById(clave)) {
-				mcrepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(Integer clave) {
+	    if (mcrepo.existsById(clave)) {
+	    	mcrepo.deleteById(clave);
+	    }
 	}
 
 	@Override
@@ -67,6 +57,9 @@ public class MaterialCavaServiceImpl implements MaterialCavaService{
 		// TODO Auto-generated method stub
 		return mcrepo.findByCavaId(cavaId);
 	}
+
+
+
 
 
 

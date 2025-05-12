@@ -41,18 +41,10 @@ public class MovimientoMaterialServiceImpl implements MovimientoMaterialService{
 	}
 
 	@Override
-	public int borrar(Long clave) {
-		try {
-			if(movmatrepo.existsById(clave)) {
-				movmatrepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(Long clave) {
+	    if (movmatrepo.existsById(clave)) {
+	    	movmatrepo.deleteById(clave);
+	    }
 	}
 
 	@Override

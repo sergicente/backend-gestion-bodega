@@ -51,18 +51,11 @@ public class PartidaServiceImpl implements PartidaService{
 	}
 
 	@Override
-	public int borrar(String clave) {
-		try {
-			if(prepo.existsById(clave)) {
-				prepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(String clave) {
+	    if (prepo.existsById(clave)) {
+	    	prepo.deleteById(clave);
+	    }
 	}
+
 
 }

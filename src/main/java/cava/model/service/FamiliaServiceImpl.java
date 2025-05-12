@@ -7,11 +7,9 @@ import org.springframework.stereotype.Service;
 
 import cava.model.entity.Cava;
 import cava.model.entity.Familia;
-import cava.model.entity.Jaula;
 import cava.model.entity.Partida;
 import cava.model.repository.CavaRepository;
 import cava.model.repository.FamiliaRepository;
-import cava.model.repository.JaulaRepository;
 import cava.model.repository.PartidaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -53,18 +51,10 @@ public class FamiliaServiceImpl implements FamiliaService{
 	}
 
 	@Override
-	public int borrar(Long clave) {
-		try {
-			if(frepo.existsById(clave)) {
-				frepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(Long clave) {
+	    if (frepo.existsById(clave)) {
+	        frepo.deleteById(clave);
+	    }
 	}
 
 }

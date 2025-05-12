@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -120,9 +121,13 @@ public class FamiliaController {
             return ResponseEntity.notFound().build();
         }
 
-        fservice.borrar(id);
-
-        return ResponseEntity.ok().body(Map.of("mensaje", "Familia eliminada correctamente"));
+        try {
+            fservice.borrar(id);
+            return ResponseEntity.ok().body(Map.of("mensaje", "Familia eliminada correctamente"));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "No se puede eliminar la familia porque está en uso (por ejemplo, en alguna cava)."));
+        }
     }
     
     @GetMapping("/material/{id}")

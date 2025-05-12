@@ -7,10 +7,8 @@ import org.springframework.stereotype.Service;
 
 import cava.model.entity.Cava;
 import cava.model.entity.Familia;
-import cava.model.entity.Jaula;
 import cava.model.entity.Partida;
 import cava.model.repository.CavaRepository;
-import cava.model.repository.JaulaRepository;
 import cava.model.repository.PartidaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -28,7 +26,6 @@ public class CavaServiceImpl implements CavaService{
 
 	@Override
 	public List<Cava> buscarTodos() {
-		// TODO Auto-generated method stub
 		return crepo.findAll();
 	}
 
@@ -56,23 +53,17 @@ public class CavaServiceImpl implements CavaService{
 	}
 
 	@Override
-	public int borrar(String clave) {
-		try {
-			if(crepo.existsById(clave)) {
-				crepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(String clave) {
+	    if (crepo.existsById(clave)) {
+	    	crepo.deleteById(clave);
+	    }
 	}
 
 	@Override
 	public List<Cava> findByFamilia(Familia familia) {
 		return crepo.findByFamilia(familia);
 	}
+
+
 
 }

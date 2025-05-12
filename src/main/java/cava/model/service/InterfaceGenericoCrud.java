@@ -8,6 +8,6 @@ public interface InterfaceGenericoCrud<E,ID> {
 	List<E> buscarTodos();
 	E insertar(E entidad);
 	E modificar(E entidad);
-	int borrar(ID clave);
+	void borrar(ID clave);
 
 }

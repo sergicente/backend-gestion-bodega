@@ -41,18 +41,12 @@ public class MovimientoBotellaServiceImpl implements MovimientoBotellaService{
 	}
 
 	@Override
-	public int borrar(Long clave) {
-		try {
-			if(movbotrepo.existsById(clave)) {
-				movbotrepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(Long clave) {
+	    if (movbotrepo.existsById(clave)) {
+	    	movbotrepo.deleteById(clave);
+	    }
 	}
+
+
 
 }

@@ -6,10 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cava.model.entity.Familia;
-import cava.model.entity.Jaula;
 import cava.model.entity.Material;
 import cava.model.entity.Partida;
-import cava.model.repository.JaulaRepository;
 import cava.model.repository.MaterialRepository;
 import cava.model.repository.PartidaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -47,23 +45,17 @@ public class MaterialServiceImpl implements MaterialService{
 	}
 
 	@Override
-	public int borrar(Long clave) {
-		try {
-			if(mrepo.existsById(clave)) {
-				mrepo.deleteById(clave);
-				return 1;
-			}else {
-				return 0;
-			}
-		}catch(Exception e) {
-			e.printStackTrace();
-			return -1;
-		}
+	public void borrar(Long clave) {
+	    if (mrepo.existsById(clave)) {
+	    	mrepo.deleteById(clave);
+	    }
 	}
 
 	@Override
 	public List<Material> findByFamilia(Familia familia) {
 		return mrepo.findByFamilia(familia);
 	}
+
+
 
 }
