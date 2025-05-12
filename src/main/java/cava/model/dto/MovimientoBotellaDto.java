@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MovimientoBotellaDto {
-
 	private Long id;
 	private LocalDate fecha;
 	private String descripcion;

@@ -17,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.CavaDto;
 import cava.model.entity.Cava;
+import cava.model.entity.Familia;
 import cava.model.entity.Partida;
 import cava.model.service.CavaService;
+import cava.model.service.FamiliaService;
 import cava.model.service.PartidaService;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -31,6 +33,8 @@ public class CavaController {
 	private CavaService cservice;
 	@Autowired
 	private PartidaService pservice;
+	@Autowired
+	private FamiliaService fservice;
 	
     // Obtener todas las partidas
     @GetMapping
@@ -57,11 +61,17 @@ public class CavaController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("No existe una partida con el ID " + cavaDto.getPartida());
         }
+        
+        Familia familia = fservice.buscar(Long.parseLong(cavaDto.getFamilia()));
+        if (familia == null) {
+            throw new EntityNotFoundException("Familia no encontrada");
+        }
 
         // Crear el Cava a partir del DTO
         Cava cava = new Cava();
         cava.setId(cavaDto.getId());
         cava.setNombre(cavaDto.getNombre());
+        cava.setFamilia(familia);
         cava.setCantidad(cavaDto.getCantidad());
         cava.setPartida(partida);
 
@@ -88,11 +98,17 @@ public class CavaController {
             if (partida == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partida no encontrada");
             }
+            
+            Familia familia = fservice.buscar(Long.parseLong(cavaDto.getFamilia()));
+            if (familia == null) {
+                throw new EntityNotFoundException("Familia no encontrada");
+            }
 
             // Montamos el objeto Cava
             Cava cava = new Cava();
             cava.setId(cavaDto.getId());
             cava.setNombre(cavaDto.getNombre());
+            cava.setFamilia(familia);
             cava.setCantidad(cavaDto.getCantidad());
             cava.setPartida(partida);
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cava.model.entity.Cava;
+import cava.model.entity.Familia;
 import cava.model.entity.Jaula;
 import cava.model.entity.Partida;
 import cava.model.repository.CavaRepository;
@@ -67,6 +68,11 @@ public class CavaServiceImpl implements CavaService{
 			e.printStackTrace();
 			return -1;
 		}
+	}
+
+	@Override
+	public List<Cava> findByFamilia(Familia familia) {
+		return crepo.findByFamilia(familia);
 	}
 
 }

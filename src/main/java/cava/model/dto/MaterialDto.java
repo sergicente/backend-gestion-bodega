@@ -8,11 +8,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MaterialDto {
-
     private Long id;
     private String nombre;
     private String tipo;
-    private String marca;
+    private Long familiaId;
     private String observaciones;
     private int cantidad;
 }

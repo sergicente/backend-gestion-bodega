@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,8 +28,9 @@ public class Material {
     @Enumerated(EnumType.STRING)
     private TipoMaterial tipo;
     
-    @Enumerated(EnumType.STRING)
-    private Marca marca;
+    @ManyToOne
+    @JoinColumn(name = "familia_id")
+    private Familia familia;
 
     private String observaciones;
     private int cantidad;

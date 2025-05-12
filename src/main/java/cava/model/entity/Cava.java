@@ -22,6 +22,10 @@ public class Cava {
     private int cantidad;
     
     @ManyToOne
+    @JoinColumn(name = "familia_id", nullable = false)
+    private Familia familia;
+    
+    @ManyToOne
     @JoinColumn(name = "partida_id", nullable = false)
     private Partida partida;
     

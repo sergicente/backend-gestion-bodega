@@ -15,16 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cava.model.dto.CavaDto;
 import cava.model.dto.MaterialDto;
-import cava.model.entity.Cava;
-import cava.model.entity.Marca;
+import cava.model.entity.Familia;
 import cava.model.entity.Material;
-import cava.model.entity.Partida;
 import cava.model.entity.TipoMaterial;
-import cava.model.service.CavaService;
+import cava.model.service.FamiliaService;
 import cava.model.service.MaterialService;
-import cava.model.service.PartidaService;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
@@ -34,7 +30,8 @@ public class MaterialController {
 	
 	@Autowired
 	private MaterialService mservice;
-	
+	@Autowired
+	private FamiliaService fservice;
 	
 	
     // Obtener todas las partidas
@@ -60,13 +57,20 @@ public class MaterialController {
     @PostMapping("/insertar")
     public ResponseEntity<?> insertarUno(@RequestBody MaterialDto materialDto) {
 
-        // Convertir DTO a entidad
+        // Buscar familia
+        Familia familia = fservice.buscar(materialDto.getFamiliaId());
+        if (familia == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Familia no encontrada");
+        }
+
+        // Crear material
         Material material = new Material(
-                null, materialDto.getNombre(),
-                TipoMaterial.valueOf(materialDto.getTipo()),
-                Marca.valueOf(materialDto.getMarca()),
-                materialDto.getObservaciones(),
-                materialDto.getCantidad()
+            null,
+            materialDto.getNombre(),
+            TipoMaterial.valueOf(materialDto.getTipo()),
+            familia,
+            materialDto.getObservaciones(),
+            materialDto.getCantidad()
         );
 
         // Guardar
@@ -74,12 +78,12 @@ public class MaterialController {
 
         // Convertir a DTO
         MaterialDto nuevoDto = new MaterialDto(
-                nuevoMaterial.getId(),
-                nuevoMaterial.getNombre(),
-                nuevoMaterial.getTipo().toString(),
-                nuevoMaterial.getMarca().toString(),
-                nuevoMaterial.getObservaciones(),
-                nuevoMaterial.getCantidad()
+            nuevoMaterial.getId(),
+            nuevoMaterial.getNombre(),
+            nuevoMaterial.getTipo().toString(),
+            nuevoMaterial.getFamilia().getId(),
+            nuevoMaterial.getObservaciones(),
+            nuevoMaterial.getCantidad()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
@@ -90,37 +94,36 @@ public class MaterialController {
     @PutMapping("/modificar/{id}")
     public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody MaterialDto materialDto) {
         try {
-            // Comprobamos que el ID en la URL y en el body coincidan
-            if (!(materialDto.getId() == id)) {
+            if (!id.equals(materialDto.getId())) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID en la URL y en el body no coinciden");
             }
 
-            // Buscar el material existente
             Material existente = mservice.buscar(id);
             if (existente == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Material no encontrado con ID " + id);
             }
 
-            // Montamos el objeto Material actualizado
-            Material material = new Material();
-            material.setId(id);
-            material.setNombre(materialDto.getNombre());
-            material.setTipo(TipoMaterial.valueOf(materialDto.getTipo()));
-            material.setMarca(Marca.valueOf(materialDto.getMarca()));
-            material.setObservaciones(materialDto.getObservaciones());
-            material.setCantidad(materialDto.getCantidad());
+            Familia familia = fservice.buscar(materialDto.getFamiliaId());
+            if (familia == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Familia no encontrada");
+            }
 
-            // Modificamos
-            Material actualizado = mservice.modificar(material);
+            // Modificar directamente
+            existente.setNombre(materialDto.getNombre());
+            existente.setTipo(TipoMaterial.valueOf(materialDto.getTipo()));
+            existente.setFamilia(familia);
+            existente.setObservaciones(materialDto.getObservaciones());
+            existente.setCantidad(materialDto.getCantidad());
 
-            // Convertimos a DTO para devolver
+            Material actualizado = mservice.modificar(existente);
+
             MaterialDto actualizadoDto = new MaterialDto(
-                    actualizado.getId(),
-                    actualizado.getNombre(),
-                    actualizado.getTipo().toString(),
-                    actualizado.getMarca().toString(),
-                    actualizado.getObservaciones(),
-                    actualizado.getCantidad()
+                actualizado.getId(),
+                actualizado.getNombre(),
+                actualizado.getTipo().toString(),
+                actualizado.getFamilia().getId(),
+                actualizado.getObservaciones(),
+                actualizado.getCantidad()
             );
 
             return ResponseEntity.ok(actualizadoDto);

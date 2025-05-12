@@ -5,42 +5,48 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cava.model.entity.Cava;
 import cava.model.entity.Familia;
 import cava.model.entity.Jaula;
-import cava.model.entity.Material;
 import cava.model.entity.Partida;
+import cava.model.repository.CavaRepository;
+import cava.model.repository.FamiliaRepository;
 import cava.model.repository.JaulaRepository;
-import cava.model.repository.MaterialRepository;
 import cava.model.repository.PartidaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class MaterialServiceImpl implements MaterialService{
+public class FamiliaServiceImpl implements FamiliaService{
 	
 	@Autowired
-	private MaterialRepository mrepo;
+	private FamiliaRepository frepo;
 
 	@Override
-	public Material buscar(Long clave) {
-		return mrepo.findById(clave).orElse(null);
+	public Familia buscar(Long clave) {
+		return frepo.findById(clave).orElse(null);
 
 	}
 
 	@Override
-	public List<Material> buscarTodos() {
+	public List<Familia> buscarTodos() {
 		// TODO Auto-generated method stub
-		return mrepo.findAll();
+		return frepo.findAll();
 	}
 
 	@Override
-	public Material insertar(Material material) {
-	    return mrepo.save(material);
+	public Familia insertar(Familia entidad) {
+	    try {
+	        return frepo.save(entidad);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return null;
+	    }
 	}
 
 	@Override
-	public Material modificar(Material entidad) {
-	    if(mrepo.existsById(entidad.getId())) {
-	        return mrepo.save(entidad);
+	public Familia modificar(Familia entidad) {
+	    if(frepo.existsById(entidad.getId())) {
+	        return frepo.save(entidad);
 	    } else {
 	        throw new EntityNotFoundException("No se encontró la entidad con ID: " + entidad.getId());
 	    }
@@ -49,8 +55,8 @@ public class MaterialServiceImpl implements MaterialService{
 	@Override
 	public int borrar(Long clave) {
 		try {
-			if(mrepo.existsById(clave)) {
-				mrepo.deleteById(clave);
+			if(frepo.existsById(clave)) {
+				frepo.deleteById(clave);
 				return 1;
 			}else {
 				return 0;
@@ -59,11 +65,6 @@ public class MaterialServiceImpl implements MaterialService{
 			e.printStackTrace();
 			return -1;
 		}
-	}
-
-	@Override
-	public List<Material> findByFamilia(Familia familia) {
-		return mrepo.findByFamilia(familia);
 	}
 
 }

@@ -1,0 +1,150 @@
+package cava.model.restcontroller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import cava.model.dto.FamiliaDto;
+import cava.model.entity.Cava;
+import cava.model.entity.Familia;
+import cava.model.entity.Material;
+import cava.model.service.CavaService;
+import cava.model.service.FamiliaService;
+import cava.model.service.MaterialService;
+
+@RestController
+@RequestMapping("/api/familia")
+@CrossOrigin(origins = "*")
+public class FamiliaController {
+	
+	@Autowired
+	private FamiliaService fservice;
+	@Autowired
+	private MaterialService mservice;
+	@Autowired
+	private CavaService cservice;
+	
+    // Obtener todas las partidas
+    @GetMapping
+    public List<Familia> obtenerTodos() {
+        return fservice.buscarTodos();
+    }
+    
+    
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerUno(@PathVariable long id) {
+    	Familia familia = fservice.buscar(id);
+    	if(familia == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la familia");
+    	}else {
+    		return ResponseEntity.ok(familia);
+    	}
+    }
+    
+    
+    
+    @PostMapping("/insertar")
+    public ResponseEntity<?> insertarUno(@RequestBody FamiliaDto dto) {
+    	
+        if (dto.getId() == null) {
+            return ResponseEntity.badRequest().body("El ID es obligatorio si no se genera automáticamente");
+        }
+
+        if (fservice.buscar(dto.getId()) != null) {
+            return ResponseEntity.badRequest().body("Ya existe una familia con ese ID");
+        }
+
+        // Convertir DTO a entidad
+        Familia familia = new Familia();
+        familia.setId(dto.getId());
+        familia.setNombre(dto.getNombre());
+
+        // Guardar
+        Familia guardada = fservice.insertar(familia);
+
+        // Convertir a DTO de respuesta
+        FamiliaDto nuevoDto = new FamiliaDto(
+            guardada.getId(),
+            guardada.getNombre()
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
+    }
+    
+    
+    
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<FamiliaDto> modificar(@PathVariable Long id, @RequestBody FamiliaDto dto) {
+        
+        // Buscar la familia existente
+        Familia existente = fservice.buscar(id);
+        if (existente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Actualizar campos
+        existente.setNombre(dto.getNombre());
+
+        // Guardar cambios
+        Familia actualizada = fservice.insertar(existente);
+
+        // Devolver DTO actualizado
+        FamiliaDto respuesta = new FamiliaDto(
+            actualizada.getId(),
+            actualizada.getNombre()
+        );
+
+        return ResponseEntity.ok(respuesta);
+    }
+	
+    
+    
+    @DeleteMapping("/borrar/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        
+        Familia existente = fservice.buscar(id);
+        if (existente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        fservice.borrar(id);
+
+        return ResponseEntity.ok().body(Map.of("mensaje", "Familia eliminada correctamente"));
+    }
+    
+    @GetMapping("/material/{id}")
+    public ResponseEntity<?> buscarMateriales(@PathVariable Long id) {
+        Familia familia = fservice.buscar(id);
+        if (familia == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Familia no encontrada con ID: " + id);
+        }
+
+        List<Material> lista = mservice.findByFamilia(familia);
+        return ResponseEntity.ok(lista);
+    }
+    
+    @GetMapping("/cavas/{id}")
+    public ResponseEntity<?> buscarCavas(@PathVariable Long id) {
+    	Familia familia = fservice.buscar(id);
+        if (familia == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Familia no encontrada con ID: " + id);
+        }
+
+        List<Cava> lista = cservice.findByFamilia(familia);
+        return ResponseEntity.ok(lista);
+    }
+	
+}
