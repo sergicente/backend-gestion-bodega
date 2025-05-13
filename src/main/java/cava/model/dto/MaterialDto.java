@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class MaterialDto {
     private Long id;
     private String nombre;
-    private String tipo;
+    private Long categoriaId;
     private Long familiaId;
     private String observaciones;
     private int cantidad;

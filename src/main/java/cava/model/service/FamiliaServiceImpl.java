@@ -5,12 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cava.model.entity.Cava;
 import cava.model.entity.Familia;
-import cava.model.entity.Partida;
-import cava.model.repository.CavaRepository;
 import cava.model.repository.FamiliaRepository;
-import cava.model.repository.PartidaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service

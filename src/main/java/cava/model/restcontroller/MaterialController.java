@@ -16,9 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.MaterialDto;
+import cava.model.entity.Categoria;
 import cava.model.entity.Familia;
 import cava.model.entity.Material;
 import cava.model.entity.TipoMaterial;
+import cava.model.service.CategoriaService;
 import cava.model.service.FamiliaService;
 import cava.model.service.MaterialService;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +34,8 @@ public class MaterialController {
 	private MaterialService mservice;
 	@Autowired
 	private FamiliaService fservice;
+	@Autowired
+	private CategoriaService catservice;
 	
 	
     // Obtener todas las partidas
@@ -46,7 +50,7 @@ public class MaterialController {
     public ResponseEntity<?> obtenerUno(@PathVariable long id) {
     	Material material = mservice.buscar(id);
     	if(material == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el material");
     	}else {
     		return ResponseEntity.ok(material);
     	}
@@ -58,6 +62,12 @@ public class MaterialController {
     public ResponseEntity<?> insertarUno(@RequestBody MaterialDto materialDto) {
 
         // Buscar familia
+        Categoria categoria = catservice.buscar(materialDto.getCategoriaId());
+        if (categoria == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Categoria no encontrada");
+        }
+    	
+        // Buscar familia
         Familia familia = fservice.buscar(materialDto.getFamiliaId());
         if (familia == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Familia no encontrada");
@@ -67,7 +77,7 @@ public class MaterialController {
         Material material = new Material(
             null,
             materialDto.getNombre(),
-            TipoMaterial.valueOf(materialDto.getTipo()),
+            categoria,
             familia,
             materialDto.getObservaciones(),
             materialDto.getCantidad()
@@ -80,7 +90,7 @@ public class MaterialController {
         MaterialDto nuevoDto = new MaterialDto(
             nuevoMaterial.getId(),
             nuevoMaterial.getNombre(),
-            nuevoMaterial.getTipo().toString(),
+            nuevoMaterial.getCategoria().getId(),
             nuevoMaterial.getFamilia().getId(),
             nuevoMaterial.getObservaciones(),
             nuevoMaterial.getCantidad()
@@ -107,10 +117,16 @@ public class MaterialController {
             if (familia == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Familia no encontrada");
             }
+            
+            // Buscar familia
+            Categoria categoria = catservice.buscar(materialDto.getCategoriaId());
+            if (categoria == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Categoria no encontrada");
+            }
 
             // Modificar directamente
             existente.setNombre(materialDto.getNombre());
-            existente.setTipo(TipoMaterial.valueOf(materialDto.getTipo()));
+            existente.setCategoria(categoria);
             existente.setFamilia(familia);
             existente.setObservaciones(materialDto.getObservaciones());
             existente.setCantidad(materialDto.getCantidad());
@@ -120,7 +136,7 @@ public class MaterialController {
             MaterialDto actualizadoDto = new MaterialDto(
                 actualizado.getId(),
                 actualizado.getNombre(),
-                actualizado.getTipo().toString(),
+                actualizado.getCategoria().getId(),
                 actualizado.getFamilia().getId(),
                 actualizado.getObservaciones(),
                 actualizado.getCantidad()
