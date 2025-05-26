@@ -99,7 +99,11 @@ public class MovimientoBotellaController {
         }
         partida.setBotellasRima(nuevaCantidadRima);
         
-
+        // Añadimos el número de botellas terminadas al stock
+        int nuevaCantidadCava = cava.getCantidad() + dto.getCantidad();
+        cava.setCantidad(nuevaCantidadCava);
+        
+        
         // Actualizar estado nuevo (suma)
 
         partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
@@ -129,7 +133,7 @@ public class MovimientoBotellaController {
         
         }
                 
-
+        
         pservice.insertar(partida);
 
         MovimientoBotella movimiento = new MovimientoBotella();

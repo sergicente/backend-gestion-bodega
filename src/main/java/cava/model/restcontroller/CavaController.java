@@ -74,6 +74,7 @@ public class CavaController {
         cava.setFamilia(familia);
         cava.setCantidad(cavaDto.getCantidad());
         cava.setPartida(partida);
+        cava.setEcologico(cavaDto.isEcologico());
 
         // Comprobar si existe el cava
         if (cservice.buscar(cava.getId()) != null) {
@@ -111,6 +112,7 @@ public class CavaController {
             cava.setFamilia(familia);
             cava.setCantidad(cavaDto.getCantidad());
             cava.setPartida(partida);
+            cava.setEcologico(cavaDto.isEcologico());
 
             // Modificamos
             Cava actualizado = cservice.modificar(cava);

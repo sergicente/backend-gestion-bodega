@@ -13,4 +13,5 @@ public class CavaDto {
     private int cantidad;
     private String partida;
     private String familia;
+    private boolean ecologico;
 }

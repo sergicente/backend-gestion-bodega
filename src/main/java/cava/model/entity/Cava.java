@@ -19,6 +19,8 @@ public class Cava {
     
     private String nombre;
     
+    private boolean ecologico;
+    
     private int cantidad;
     
     @ManyToOne
