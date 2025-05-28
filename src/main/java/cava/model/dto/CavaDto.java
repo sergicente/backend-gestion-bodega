@@ -16,5 +16,4 @@ public class CavaDto {
     private boolean ecologico;
     private String partidaId;
     private int PartidaBotellasRima;
-    
 }

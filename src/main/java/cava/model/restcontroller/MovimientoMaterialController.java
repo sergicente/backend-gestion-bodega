@@ -130,24 +130,13 @@ public class MovimientoMaterialController {
         matservice.insertar(material);
 
         // Guardar el movimiento
-        MovimientoMaterial movimiento = new MovimientoMaterial();
-        movimiento.setFecha(dto.getFecha());
-        movimiento.setTipo(dto.getTipo());
-        movimiento.setDescripcion(dto.getDescripcion());
-        movimiento.setCantidad(dto.getCantidad());
+        MovimientoMaterial movimiento = mapper.map(dto, MovimientoMaterial.class);
         movimiento.setMaterial(material);
-
+        
         movimiento = mservice.insertar(movimiento);
 
         // Preparar DTO de respuesta
-        MovimientoMaterialDto nuevoDto = new MovimientoMaterialDto(
-            movimiento.getId(),
-            movimiento.getFecha(),
-            movimiento.getTipo(),
-            movimiento.getDescripcion(),
-            movimiento.getCantidad(),
-            material.getId()
-        );
+        MovimientoMaterialDto nuevoDto = mapper.map(movimiento, MovimientoMaterialDto.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
     }

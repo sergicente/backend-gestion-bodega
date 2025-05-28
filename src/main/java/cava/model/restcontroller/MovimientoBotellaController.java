@@ -125,7 +125,7 @@ public class MovimientoBotellaController {
         List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
         for(MaterialCava mat : lista) {
         	Material material = mat.getMaterial();
-        	int cantidadARestar = Math.round(mat.getCantidadNecesariaPorBotella() * dto.getCantidad());
+        	int cantidadARestar = Math.round(mat.getMaterial().getCantidadGastada() * dto.getCantidad());
         	int nuevoStock = material.getCantidad() - cantidadARestar;
         	if(nuevoStock < 0 ) {
         		throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());

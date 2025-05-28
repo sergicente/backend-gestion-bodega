@@ -68,7 +68,7 @@ public class CavaController {
     public ResponseEntity<?> insertarUno(@RequestBody CavaDto cavaDto){
 
         // Buscar la partida por ID
-        Partida partida = pservice.buscar(cavaDto.getPartida());
+        Partida partida = pservice.buscar(cavaDto.getPartidaId());
         if (partida == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("No existe una partida con el ID " + cavaDto.getPartida());
@@ -108,7 +108,7 @@ public class CavaController {
             }
 
             // Buscar la partida correspondiente
-            Partida partida = pservice.buscar(cavaDto.getPartida());
+            Partida partida = pservice.buscar(cavaDto.getPartidaId());
             if (partida == null) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partida no encontrada");
             }
