@@ -1,7 +1,9 @@
 package cava.model.restcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +37,20 @@ public class CavaController {
 	private PartidaService pservice;
 	@Autowired
 	private FamiliaService fservice;
+	@Autowired
+	private ModelMapper mapper;
 	
     // Obtener todas las partidas
     @GetMapping
-    public List<Cava> obtenerTodos() {
-        return cservice.buscarTodos();
+    public ResponseEntity<List<CavaDto>> obtenerTodos() {
+    	List<Cava> cavas = cservice.buscarTodos();
+    	List<CavaDto> resultado = new ArrayList<>();
+    	for(Cava cava : cavas) {
+    		CavaDto dto = mapper.map(cava, CavaDto.class);
+    		resultado.add(dto);
+    	}
+
+        return ResponseEntity.ok(resultado);
     }
     
     @GetMapping("/{id}")
@@ -48,7 +59,8 @@ public class CavaController {
     	if(cava == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
     	}else {
-    		return ResponseEntity.ok(cava);
+    		CavaDto dto = mapper.map(cava, CavaDto.class);
+    		return ResponseEntity.ok(dto);
     	}
     }
     
@@ -83,7 +95,8 @@ public class CavaController {
         }
 
         Cava nuevo = cservice.insertar(cava);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+        CavaDto dto = mapper.map(nuevo, CavaDto.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
     
     @PutMapping("/modificar/{id}")
@@ -116,7 +129,9 @@ public class CavaController {
 
             // Modificamos
             Cava actualizado = cservice.modificar(cava);
-            return ResponseEntity.ok(actualizado);
+            CavaDto dto = mapper.map(actualizado, CavaDto.class);
+
+            return ResponseEntity.ok(dto);
 
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

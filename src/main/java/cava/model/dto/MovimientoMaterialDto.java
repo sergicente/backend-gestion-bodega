@@ -17,5 +17,6 @@ public class MovimientoMaterialDto {
     private String descripcion;
     private int cantidad;
     private Long materialId;
+    private String materialNombre;
     
 }

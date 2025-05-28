@@ -1,8 +1,10 @@
 package cava.model.restcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -17,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cava.model.dto.CavaDto;
 import cava.model.dto.FamiliaDto;
+import cava.model.dto.MaterialDto;
 import cava.model.entity.Cava;
 import cava.model.entity.Familia;
 import cava.model.entity.Material;
@@ -36,11 +40,20 @@ public class FamiliaController {
 	private MaterialService mservice;
 	@Autowired
 	private CavaService cservice;
+	@Autowired
+	private ModelMapper mapper;
 	
     // Obtener todas las partidas
     @GetMapping
-    public List<Familia> obtenerTodos() {
-        return fservice.buscarTodos();
+    public ResponseEntity<?> obtenerTodos() {
+        List<Familia> familias = fservice.buscarTodos();
+        List<FamiliaDto> listado = new ArrayList<>();
+
+        for (Familia f : familias) {
+            listado.add(mapper.map(f, FamiliaDto.class));
+        }
+
+        return ResponseEntity.ok(listado);
     }
     
     
@@ -51,7 +64,8 @@ public class FamiliaController {
     	if(familia == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la familia");
     	}else {
-    		return ResponseEntity.ok(familia);
+    		FamiliaDto dto = mapper.map(familia, FamiliaDto.class);
+    		return ResponseEntity.ok(dto);
     	}
     }
     
@@ -138,18 +152,29 @@ public class FamiliaController {
         }
 
         List<Material> lista = mservice.findByFamilia(familia);
-        return ResponseEntity.ok(lista);
+        List<MaterialDto> listadoDto = new ArrayList<>();
+        for(Material m : lista){
+        	MaterialDto dto = mapper.map(m, MaterialDto.class);
+        	listadoDto.add(dto);
+        }
+        return ResponseEntity.ok(listadoDto);
     }
     
     @GetMapping("/cavas/{id}")
     public ResponseEntity<?> buscarCavas(@PathVariable Long id) {
-    	Familia familia = fservice.buscar(id);
+        Familia familia = fservice.buscar(id);
         if (familia == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Familia no encontrada con ID: " + id);
         }
 
         List<Cava> lista = cservice.findByFamilia(familia);
-        return ResponseEntity.ok(lista);
+        List<CavaDto> listadoDto = new ArrayList<>();
+        for (Cava c : lista) {
+            CavaDto dto = mapper.map(c, CavaDto.class);
+            listadoDto.add(dto);
+        }
+
+        return ResponseEntity.ok(listadoDto);
     }
 	
 }

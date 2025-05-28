@@ -11,7 +11,10 @@ public class CavaDto {
     private String id;
     private String nombre;
     private int cantidad;
-    private String partida;
+    private PartidaDto partida;
     private String familia;
     private boolean ecologico;
+    private String partidaId;
+    private int PartidaBotellasRima;
+    
 }

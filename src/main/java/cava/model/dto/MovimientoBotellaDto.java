@@ -20,4 +20,5 @@ public class MovimientoBotellaDto {
 	private EstadoBotella estadoNuevo;
 	private String partidaId;
 	private String cavaId;
+	private String cavaNombre;
 }

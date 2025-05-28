@@ -1,7 +1,9 @@
 package cava.model.restcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cava.model.dto.PartidaDto;
 import cava.model.entity.Partida;
 import cava.model.service.PartidaService;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,47 +29,71 @@ public class PartidaController {
 	
 	@Autowired
 	private PartidaService pservice;
+	@Autowired
+	private ModelMapper mapper;
 	
     // Obtener todas las partidas
     @GetMapping
-    public List<Partida> obtenerTodas() {
-        return pservice.buscarTodos();
+    public ResponseEntity<?> obtenerTodas() {
+        List<Partida> partidas = pservice.buscarTodos();
+        List<PartidaDto> dtos = new ArrayList<>();
+
+        for (Partida p : partidas) {
+            PartidaDto dto = mapper.map(p, PartidaDto.class);
+            dtos.add(dto);
+        }
+
+        return ResponseEntity.ok(dtos);
     }
+    
+    
     
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUno(@PathVariable String id) {
-    	Partida cava = pservice.buscar(id);
-    	if(cava == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
-    	}else {
-    		return ResponseEntity.ok(cava);
-    	}
+        Partida partida = pservice.buscar(id);
+        if (partida == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
+        } else {
+            PartidaDto dto = mapper.map(partida, PartidaDto.class);
+            return ResponseEntity.ok(dto);
+        }
     }
     
+    
+    
     @PostMapping("/insertar")
-    public ResponseEntity<?> insertarUno(@RequestBody Partida cava){
-    	
-        // Verifica si el ID ya existe en la base de datos
-        Partida partidaExistente = pservice.buscar(cava.getId());
+    public ResponseEntity<?> insertarUno(@RequestBody Partida cava) {
 
+        // Verifica si ya existe
+        Partida partidaExistente = pservice.buscar(cava.getId());
         if (partidaExistente != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Error: Ya existe una partida con el ID " + cava.getId());
         }
-    	
-    	Partida nuevaPartida = pservice.insertar(cava);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaPartida);
+
+        // Inserta la nueva partida
+        Partida nuevaPartida = pservice.insertar(cava);
+
+        // Mapea a DTO manualmente, sin streams
+        PartidaDto dto = mapper.map(nuevaPartida, PartidaDto.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
+    
+    
     
     @PutMapping("/modificar/{id}")
     public ResponseEntity<?> modificar(@PathVariable String id, @RequestBody Partida cava) {
         try {
-            // Aseguramos que el ID del objeto concuerda con el path variable (opcional)
             if (!cava.getId().equals(id)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID en la URL y el body no coinciden");
             }
+
             Partida actualizado = pservice.modificar(cava);
-            return ResponseEntity.ok(actualizado);
+            PartidaDto dto = mapper.map(actualizado, PartidaDto.class);
+
+            return ResponseEntity.ok(dto);
+
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (Exception e) {

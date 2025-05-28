@@ -1,7 +1,9 @@
 package cava.model.restcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,39 +41,49 @@ public class MovimientoBotellaController {
 	
 	@Autowired
 	private MovimientoBotellaService mservice;
-	
 	@Autowired
 	private MovimientoMaterialService mmservice;
-	
 	@Autowired
 	private PartidaService pservice;
-	
 	@Autowired
 	private CavaService cservice;
-	
 	@Autowired
 	private MaterialService matservice;
-	
 	@Autowired
 	private MaterialCavaService mcservice;
+	@Autowired
+	private ModelMapper mapper;
+	
+	
+	
 	
     // Obtener todas las partidas
-    @GetMapping
-    public List<MovimientoBotella> obtenerTodos() {
-        return mservice.buscarTodos();
-    }
+	@GetMapping
+	public ResponseEntity<?> obtenerTodos() {
+	    List<MovimientoBotella> lista = mservice.buscarTodos();
+	    List<MovimientoBotellaDto> dtos = new ArrayList<>();
+
+	    for (MovimientoBotella m : lista) {
+	        MovimientoBotellaDto dto = mapper.map(m, MovimientoBotellaDto.class);
+	        dtos.add(dto);
+	    }
+
+	    return ResponseEntity.ok(dtos);
+	}
     
     
     // Obtener un movimiento
-    @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
-    	MovimientoBotella movimiento = mservice.buscar(id);
-    	if(movimiento == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
-    	}else {
-    		return ResponseEntity.ok(movimiento);
-    	}
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
+	    MovimientoBotella movimiento = mservice.buscar(id);
+
+	    if (movimiento == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento");
+	    } else {
+	        MovimientoBotellaDto dto = mapper.map(movimiento, MovimientoBotellaDto.class);
+	        return ResponseEntity.ok(dto);
+	    }
+	}
 
     
     

@@ -11,7 +11,10 @@ public class MaterialDto {
     private Long id;
     private String nombre;
     private Long categoriaId;
+    private String categoriaNombre;
     private Long familiaId;
+    private String familiaNombre;
     private String observaciones;
     private int cantidad;
+    private float cantidadGastada;
 }

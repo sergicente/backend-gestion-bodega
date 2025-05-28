@@ -35,4 +35,5 @@ public class Material {
 
     private String observaciones;
     private int cantidad;
+    private float cantidadGastada;
 }

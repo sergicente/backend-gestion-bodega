@@ -1,7 +1,9 @@
 package cava.model.restcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,40 +34,56 @@ public class MovimientoMaterialController {
 	
 	@Autowired
 	private MovimientoMaterialService mservice;
-	
 	@Autowired
 	private PartidaService pservice;
-	
 	@Autowired
 	private MaterialService matservice;
+	@Autowired
+	private ModelMapper mapper;
 	
     // Obtener todas las partidas
     @GetMapping
-    public List<MovimientoMaterial> obtenerTodos() {
-        return mservice.buscarTodos();
+    public ResponseEntity<?> obtenerTodos() {
+        List<MovimientoMaterial> lista = mservice.buscarTodos();
+        List<MovimientoMaterialDto> dtos = new ArrayList<>();
+
+        for (MovimientoMaterial m : lista) {
+            MovimientoMaterialDto dto = mapper.map(m, MovimientoMaterialDto.class);
+            dtos.add(dto);
+        }
+
+        return ResponseEntity.ok(dtos);
     }
     
     
     // Obtener un movimiento
     @GetMapping("/{id}")
     public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
-    	MovimientoMaterial movimiento = mservice.buscar(id);
-    	if(movimiento == null) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
-    	}else {
-    		return ResponseEntity.ok(movimiento);
-    	}
+        MovimientoMaterial movimiento = mservice.buscar(id);
+        if (movimiento == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento");
+        } else {
+            MovimientoMaterialDto dto = mapper.map(movimiento, MovimientoMaterialDto.class);
+            return ResponseEntity.ok(dto);
+        }
     }
     
     // Obtener un movimiento
     @GetMapping("/articulo/{id}")
     public ResponseEntity<?> obtenerMovimientosDeUnArticulo(@PathVariable Long id) {
-    	List <MovimientoMaterial> movimientos = mservice.findByMaterialId(id);
-    	if(movimientos.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentran movimientos");
-    	}else {
-    		return ResponseEntity.ok(movimientos);
-    	}
+        List<MovimientoMaterial> movimientos = mservice.findByMaterialId(id);
+
+        if (movimientos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentran movimientos para el material con ID: " + id);
+        }
+
+        List<MovimientoMaterialDto> dtos = new ArrayList<>();
+        for (MovimientoMaterial m : movimientos) {
+            MovimientoMaterialDto dto = mapper.map(m, MovimientoMaterialDto.class);
+            dtos.add(dto);
+        }
+
+        return ResponseEntity.ok(dtos);
     }
     
     

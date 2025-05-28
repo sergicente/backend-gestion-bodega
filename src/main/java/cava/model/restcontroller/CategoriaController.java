@@ -1,8 +1,10 @@
 package cava.model.restcontroller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.CategoriaDto;
 import cava.model.dto.FamiliaDto;
+import cava.model.dto.MaterialDto;
 import cava.model.entity.Categoria;
 import cava.model.entity.Cava;
 import cava.model.entity.Familia;
@@ -36,17 +39,21 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaService catservice;
 	@Autowired
-	private FamiliaService fservice;
-	@Autowired
 	private MaterialService mservice;
 	@Autowired
-	private CavaService cservice;
+	private ModelMapper mapper;
 	
 	
     // Obtener todas las partidas
     @GetMapping
-    public List<Categoria> obtenerTodos() {
-        return catservice.buscarTodos();
+    public ResponseEntity<?> obtenerTodos() {
+    	List<Categoria> categorias = catservice.buscarTodos();
+    	List<CategoriaDto> listaDto = new ArrayList<>();
+    	for(Categoria c : categorias) {
+    		CategoriaDto dto = mapper.map(c, CategoriaDto.class);
+    		listaDto.add(dto);
+    	}
+        return ResponseEntity.ok(listaDto);
     }
     
     
@@ -142,9 +149,13 @@ public class CategoriaController {
         if (categoria == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Familia no encontrada con ID: " + id);
         }
-
         List<Material> lista = mservice.findByCategoria(categoria);
-        return ResponseEntity.ok(lista);
+        List<MaterialDto> listaDto = new ArrayList<>();
+        for(Material m : lista){
+        	MaterialDto dto = mapper.map(m, MaterialDto.class);
+        	listaDto.add(dto);
+        }
+        return ResponseEntity.ok(listaDto);
     }
 
 	
