@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.CavaDto;
 import cava.model.entity.Cava;
+import cava.model.entity.CavaPartida;
 import cava.model.entity.Familia;
 import cava.model.entity.Partida;
+import cava.model.service.CavaPartidaService;
 import cava.model.service.CavaService;
 import cava.model.service.FamiliaService;
 import cava.model.service.PartidaService;
@@ -37,6 +39,8 @@ public class CavaController {
 	private PartidaService pservice;
 	@Autowired
 	private FamiliaService fservice;
+	@Autowired
+	private CavaPartidaService cpservice;
 	@Autowired
 	private ModelMapper mapper;
 	
@@ -65,39 +69,33 @@ public class CavaController {
     }
     
     @PostMapping("/insertar")
-    public ResponseEntity<?> insertarUno(@RequestBody CavaDto cavaDto){
+    public ResponseEntity<?> insertarUno(@RequestBody CavaDto cavaDto) {
 
-        // Buscar la partida por ID
-        Partida partida = pservice.buscar(cavaDto.getPartidaId());
-        if (partida == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("No existe una partida con el ID " + cavaDto.getPartida());
-        }
-        
-        Familia familia = fservice.buscar(Long.parseLong(cavaDto.getFamilia()));
+        // Verificar existencia de la familia
+        Familia familia = fservice.buscar(Long.parseLong(cavaDto.getFamiliaId()));
         if (familia == null) {
-            throw new EntityNotFoundException("Familia no encontrada");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("No existe una familia con el ID " + cavaDto.getFamiliaId());
         }
 
-        // Crear el Cava a partir del DTO
-        Cava cava = new Cava();
-        cava.setId(cavaDto.getId());
-        cava.setNombre(cavaDto.getNombre());
-        cava.setFamilia(familia);
-        cava.setCantidad(cavaDto.getCantidad());
-        cava.setPartida(partida);
-        cava.setEcologico(cavaDto.isEcologico());
-
-        // Comprobar si existe el cava
-        if (cservice.buscar(cava.getId()) != null) {
+        // Verificar si ya existe un cava con ese ID
+        if (cservice.buscar(cavaDto.getId()) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("Error: Ya existe un cava con el ID " + cava.getId());
+                    .body("Error: Ya existe un cava con el ID " + cavaDto.getId());
         }
 
-        Cava nuevo = cservice.insertar(cava);
-        CavaDto dto = mapper.map(nuevo, CavaDto.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        // Mapear el DTO a entidad
+        Cava cava = mapper.map(cavaDto, Cava.class);
+        cava.setFamilia(familia); // Relación que no puede mapear directamente
+
+        // Guardar el cava
+        cava = cservice.insertar(cava);
+
+        // Devolver el DTO como respuesta
+        CavaDto respuestaDto = mapper.map(cava, CavaDto.class);
+        return ResponseEntity.status(HttpStatus.CREATED).body(respuestaDto);
     }
+ 
     
     @PutMapping("/modificar/{id}")
     public ResponseEntity<?> modificar(@PathVariable String id, @RequestBody CavaDto cavaDto) {
@@ -106,26 +104,14 @@ public class CavaController {
             if (!cavaDto.getId().equals(id)) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID en la URL y el body no coinciden");
             }
-
-            // Buscar la partida correspondiente
-            Partida partida = pservice.buscar(cavaDto.getPartidaId());
-            if (partida == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partida no encontrada");
-            }
             
-            Familia familia = fservice.buscar(Long.parseLong(cavaDto.getFamilia()));
+            Familia familia = fservice.buscar(Long.parseLong(cavaDto.getFamiliaId()));
             if (familia == null) {
                 throw new EntityNotFoundException("Familia no encontrada");
             }
 
             // Montamos el objeto Cava
-            Cava cava = new Cava();
-            cava.setId(cavaDto.getId());
-            cava.setNombre(cavaDto.getNombre());
-            cava.setFamilia(familia);
-            cava.setCantidad(cavaDto.getCantidad());
-            cava.setPartida(partida);
-            cava.setEcologico(cavaDto.isEcologico());
+            Cava cava = mapper.map(cavaDto, Cava.class);
 
             // Modificamos
             Cava actualizado = cservice.modificar(cava);

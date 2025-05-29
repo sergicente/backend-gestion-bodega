@@ -1,9 +1,12 @@
 package cava.model.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,4 +34,5 @@ public class Partida {
     private String variedad2;
     private String variedad3;
     private String variedad4;
+
 }

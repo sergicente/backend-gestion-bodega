@@ -29,7 +29,12 @@ public class MaterialCavaServiceImpl implements MaterialCavaService{
 
 	@Override
 	public MaterialCava insertar(MaterialCava material) {
-	    return mcrepo.save(material);
+		try {
+			return mcrepo.save(material);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override

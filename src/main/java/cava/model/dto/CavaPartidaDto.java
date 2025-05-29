@@ -7,10 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CavaDto {
-    private String id;
-    private String nombre;
+public class CavaPartidaDto {
+	private Long id;
+    private String cavaId;
+    private String partidaId;
+    private boolean actual;
     private int cantidad;
-    private String familiaId;
-    private boolean ecologico;
+    private int partidaBotellasRima;
 }
