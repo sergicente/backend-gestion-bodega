@@ -1,6 +1,7 @@
 package cava.model.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +59,11 @@ public class CavaPartidaServiceImpl implements CavaPartidaService{
 	@Override
 	public List<CavaPartida> findByCavaId(String cavaId) {
 		return prepo.findByCavaId(cavaId);
+	}
+
+	@Override
+	public Optional<CavaPartida> buscarPorCavaYPartida(String idCava, String idPartida) {
+	    return prepo.findByCavaIdAndPartidaId(idCava, idPartida);
 	}
 
 

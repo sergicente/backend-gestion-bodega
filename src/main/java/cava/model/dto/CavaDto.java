@@ -1,5 +1,8 @@
 package cava.model.dto;
 
+
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +13,8 @@ import lombok.NoArgsConstructor;
 public class CavaDto {
     private String id;
     private String nombre;
-    private int cantidad;
     private String familiaId;
     private boolean ecologico;
+    private PartidaDto partidaActual;
+    private List<CavaPartidaDto> partidasRelacionadas;
 }

@@ -29,5 +29,7 @@ public class CavaPartida {
 
     private int cantidad;
     
+    private int vendido;
+    
     private boolean actual;
 }

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.CavaDto;
+import cava.model.dto.PartidaDto;
 import cava.model.entity.Cava;
 import cava.model.entity.CavaPartida;
 import cava.model.entity.Familia;
@@ -51,6 +52,15 @@ public class CavaController {
     	List<CavaDto> resultado = new ArrayList<>();
     	for(Cava cava : cavas) {
     		CavaDto dto = mapper.map(cava, CavaDto.class);
+    		
+    		
+            for (CavaPartida cp : cava.getPartidasRelacionadas()) {
+                if (cp.isActual()) {
+                    dto.setPartidaActual(mapper.map(cp.getPartida(), PartidaDto.class));
+                    break;
+                }
+            }
+    		
     		resultado.add(dto);
     	}
 

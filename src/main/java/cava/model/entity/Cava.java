@@ -25,10 +25,12 @@ public class Cava {
     
     private boolean ecologico;
     
-    private int cantidad;
-    
     @ManyToOne
     @JoinColumn(name = "familia_id", nullable = false)
     private Familia familia;
+    
+
+    @OneToMany(mappedBy = "cava", cascade = CascadeType.ALL)
+    private List<CavaPartida> partidasRelacionadas;
 
 }

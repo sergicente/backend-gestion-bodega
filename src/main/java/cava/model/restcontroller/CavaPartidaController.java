@@ -1,7 +1,10 @@
 package cava.model.restcontroller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +16,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.CavaPartidaDto;
 import cava.model.dto.MaterialCavaDto;
 import cava.model.dto.MaterialDto;
+import cava.model.dto.VentaRequestDto;
 import cava.model.entity.Cava;
 import cava.model.entity.CavaPartida;
 import cava.model.entity.Material;
@@ -67,13 +72,7 @@ public class CavaPartidaController {
 
 	    for (CavaPartida relacion : relaciones) {
 	    	Partida partida = relacion.getPartida();
-	    	CavaPartidaDto dto = mapper.map(relacion.getCava(), CavaPartidaDto.class);
-	        // Completar campos adicionales desde las relaciones
-	    	dto.setId(relacion.getId());
-	        dto.setPartidaId(relacion.getPartida().getId());
-	        dto.setPartidaBotellasRima(partida.getBotellasRima());
-	        dto.setActual(relacion.isActual());
-
+	    	CavaPartidaDto dto = mapper.map(relacion, CavaPartidaDto.class);
 	        relacionesDto.add(dto);
 	    }
 
@@ -81,10 +80,14 @@ public class CavaPartidaController {
 	}
 
 	@PostMapping("/{idCava}/{idPartida}")
-	public ResponseEntity<?> asignarPartida(@PathVariable String idCava, @PathVariable String idPartida) {
+	public ResponseEntity<?> asignarPartida(
+	    @PathVariable String idCava,
+	    @PathVariable String idPartida,
+	    @RequestBody CavaPartidaDto datos) {
+		
+		
 	    try {
 	        Cava cava = cservice.buscar(idCava);
-	        System.out.println(cava);
 	        if (cava == null) {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
 	                    .body("No se encontró la cava con ID: " + idCava);
@@ -93,25 +96,53 @@ public class CavaPartidaController {
 	        Partida partida = pservice.buscar(idPartida);
 	        if (partida == null) {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-	                    .body("No se encontró el material con ID: " + idPartida);
+	                    .body("No se encontró la partida con ID: " + idPartida);
 	        }
-	        System.out.println(partida);
 
-	        CavaPartida nuevaRelacion = new CavaPartida();
-	        nuevaRelacion.setCava(cava);
-	        nuevaRelacion.setPartida(partida);
-	        nuevaRelacion.setActual(false);
+	        // Verificar si ya existe
+	        Optional<CavaPartida> existente = cpservice.buscarPorCavaYPartida(idCava, idPartida);
+	        
+	        
 
-	        CavaPartida guardado = cpservice.insertar(nuevaRelacion);
+	        if (existente.isPresent()) {
+	            CavaPartida relacion = existente.get();
 
-	        CavaPartidaDto dto = mapper.map(guardado, CavaPartidaDto.class);
-	        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+	            System.out.println("Cantidad previa: " + relacion.getCantidad());
+	            System.out.println("Cantidad a añadir: " + datos.getCantidad());
+
+	            int nuevaCantidad = relacion.getCantidad() + datos.getCantidad();
+	            relacion.setCantidad(nuevaCantidad);
+
+	            System.out.println("Cantidad resultante: " + relacion.getCantidad());
+
+	            CavaPartida actualizado = cpservice.modificar(relacion); // usa `modificar` en vez de `insertar` si lo tienes
+
+	            return ResponseEntity.ok(mapper.map(actualizado, CavaPartidaDto.class));
+	        }else {
+	            CavaPartida nuevaRelacion = new CavaPartida();
+	            nuevaRelacion.setCava(cava);
+	            nuevaRelacion.setPartida(partida);
+	            nuevaRelacion.setCantidad(datos.getCantidad());
+	            nuevaRelacion.setActual(false);
+
+	            CavaPartida guardado = cpservice.insertar(nuevaRelacion);
+	            CavaPartidaDto dto = mapper.map(guardado, CavaPartidaDto.class);
+	            return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+	        }
 
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("Error al asignar el material al cava: " + e.getMessage());
+	                .body("Error al asignar la partida al cava: " + e.getMessage());
 	    }
 	}
+	
+	
+	@GetMapping("/existe/{idCava}/{idPartida}")
+	public ResponseEntity<Boolean> existeRelacion(@PathVariable String idCava, @PathVariable String idPartida) {
+	    Optional<CavaPartida> relacion = cpservice.buscarPorCavaYPartida(idCava, idPartida);
+	    return ResponseEntity.ok(relacion.isPresent());
+	}
+	
 	
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
@@ -142,4 +173,41 @@ public class CavaPartidaController {
         cpservice.modificar(existente);
         return ResponseEntity.ok().build();
     }
+    
+    
+    
+    
+    @PutMapping("/vender/{id}")
+    public ResponseEntity<?> actualizarStock(
+        @PathVariable Long id,
+        @RequestBody VentaRequestDto request
+    ) {
+        CavaPartida cp = cpservice.buscar(id);
+        int disponibles = cp.getCantidad();
+        int vendidas = request.getUnidades();
+        
+        if (vendidas <= 0) {
+            return ResponseEntity.badRequest().body("La cantidad vendida debe ser mayor que cero.");
+        }
+
+        if (vendidas > disponibles) {
+            return ResponseEntity.badRequest().body("No hay suficiente stock.");
+        }
+        
+        cp.setCantidad(disponibles - vendidas);
+        cp.setVendido(cp.getVendido() + vendidas); // si usas ese campo        
+        
+        Partida partida = cp.getPartida();
+        partida.setBotellasStock(partida.getBotellasStock() - vendidas);
+        partida.setBotellasVendidas(partida.getBotellasVendidas() + vendidas);
+        cpservice.modificar(cp);
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("mensaje", "Stock actualizado");
+        body.put("nuevoStock", cp.getCantidad());
+        body.put("vendido", cp.getVendido());
+
+        return ResponseEntity.ok(body);
+    }
+    
 }
