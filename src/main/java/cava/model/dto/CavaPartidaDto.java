@@ -1,5 +1,7 @@
 package cava.model.dto;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +19,5 @@ public class CavaPartidaDto {
     private int cantidad;
     private int vendido;
     private int partidaBotellasRima;
+    private LocalDateTime ultimaActualizacion;
 }

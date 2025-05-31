@@ -34,5 +34,6 @@ public class MovimientoMaterial {
     @JoinColumn(name = "material_id")
 	private Material material;
 	
-	
+    private int stockResultante;
+
 }

@@ -1,5 +1,6 @@
 package cava.model.restcontroller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -195,7 +196,8 @@ public class CavaPartidaController {
         }
         
         cp.setCantidad(disponibles - vendidas);
-        cp.setVendido(cp.getVendido() + vendidas); // si usas ese campo        
+        cp.setVendido(cp.getVendido() + vendidas);
+        cp.setUltimaActualizacion(LocalDateTime.now());
         
         Partida partida = cp.getPartida();
         partida.setBotellasStock(partida.getBotellasStock() - vendidas);
@@ -207,7 +209,8 @@ public class CavaPartidaController {
         body.put("nuevoStock", cp.getCantidad());
         body.put("vendido", cp.getVendido());
 
-        return ResponseEntity.ok(body);
+        CavaPartidaDto dto = mapper.map(cp, CavaPartidaDto.class);
+        return ResponseEntity.ok(dto);
     }
     
 }

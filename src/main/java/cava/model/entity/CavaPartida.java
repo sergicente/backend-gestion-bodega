@@ -1,5 +1,7 @@
 package cava.model.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,4 +34,6 @@ public class CavaPartida {
     private int vendido;
     
     private boolean actual;
+    
+    private LocalDateTime ultimaActualizacion;
 }

@@ -18,5 +18,6 @@ public class MovimientoMaterialDto {
     private int cantidad;
     private Long materialId;
     private String materialNombre;
-    
+    private int stockResultante;
+
 }

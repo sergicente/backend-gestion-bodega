@@ -22,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 import cava.model.dto.CavaDto;
 import cava.model.dto.FamiliaDto;
 import cava.model.dto.MaterialDto;
+import cava.model.dto.PartidaDto;
 import cava.model.entity.Cava;
+import cava.model.entity.CavaPartida;
 import cava.model.entity.Familia;
 import cava.model.entity.Material;
 import cava.model.service.CavaService;
@@ -140,7 +142,7 @@ public class FamiliaController {
             return ResponseEntity.ok().body(Map.of("mensaje", "Familia eliminada correctamente"));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "No se puede eliminar la familia porque está en uso (por ejemplo, en alguna cava)."));
+                    .body(Map.of("error", "No se puede eliminar la familia porque está en uso"));
         }
     }
     
@@ -169,8 +171,18 @@ public class FamiliaController {
 
         List<Cava> lista = cservice.findByFamilia(familia);
         List<CavaDto> listadoDto = new ArrayList<>();
+
+        
         for (Cava c : lista) {
             CavaDto dto = mapper.map(c, CavaDto.class);
+
+            for (CavaPartida cp : c.getPartidasRelacionadas()) {
+                if (cp.isActual()) {
+                    dto.setPartidaActual(mapper.map(cp.getPartida(), PartidaDto.class));
+                    break;
+                }
+            }
+
             listadoDto.add(dto);
         }
 

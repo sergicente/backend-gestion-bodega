@@ -111,28 +111,31 @@ public class MovimientoMaterialController {
             throw new EntityNotFoundException("No se encontró el material: " + dto.getMaterialId());
         }
 
+        int stockFinal;
+
         // Actualizar stock
         switch (dto.getTipo()) {
             case ENTRADA:
-                material.setCantidad(material.getCantidad() + dto.getCantidad());
+                stockFinal = material.getCantidad() + dto.getCantidad();
                 break;
             case SALIDA:
-                int nuevaCantidad = material.getCantidad() - dto.getCantidad();
-                if (nuevaCantidad < 0) {
+                stockFinal = material.getCantidad() - dto.getCantidad();
+                if (stockFinal < 0) {
                     throw new IllegalArgumentException("No hay suficiente stock para realizar la salida");
                 }
-                material.setCantidad(nuevaCantidad);
                 break;
             default:
                 throw new IllegalArgumentException("Tipo de movimiento desconocido");
         }
 
+        material.setCantidad(stockFinal);
         matservice.insertar(material);
 
         // Guardar el movimiento
         MovimientoMaterial movimiento = mapper.map(dto, MovimientoMaterial.class);
         movimiento.setMaterial(material);
-        
+        movimiento.setStockResultante(stockFinal);
+
         movimiento = mservice.insertar(movimiento);
 
         // Preparar DTO de respuesta

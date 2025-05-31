@@ -133,10 +133,10 @@ public class MovimientoBotellaController {
         	MovimientoMaterial mov = new MovimientoMaterial();
         	mov.setFecha(dto.getFecha());
         	mov.setTipo(TipoMovimientoMaterial.SALIDA);
-        	mov.setDescripcion("Uso de material en degüelle " + dto.getLot() + " de " + dto.getCantidad() + " botellas de " + cava.getNombre());
+        	mov.setDescripcion("Degüelle " + dto.getCantidad() + " botellas de " + cava.getNombre() + " (" + dto.getLot() + ")");
         	mov.setCantidad(cantidadARestar);
         	mov.setMaterial(material);
-        	
+        	mov.setStockResultante(nuevoStock);
         	mmservice.insertar(mov);
         	
         
