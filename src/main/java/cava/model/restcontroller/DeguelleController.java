@@ -16,31 +16,31 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cava.model.dto.MovimientoBotellaDto;
+import cava.model.dto.DeguelleDto;
 import cava.model.dto.MovimientoMaterialDto;
 import cava.model.entity.Cava;
 import cava.model.entity.Material;
 import cava.model.entity.MaterialCava;
-import cava.model.entity.MovimientoBotella;
+import cava.model.entity.Deguelle;
 import cava.model.entity.MovimientoMaterial;
 import cava.model.entity.Partida;
 import cava.model.entity.TipoMovimientoMaterial;
 import cava.model.service.CavaService;
 import cava.model.service.MaterialCavaService;
 import cava.model.service.MaterialService;
-import cava.model.service.MovimientoBotellaService;
+import cava.model.service.DeguelleService;
 import cava.model.service.MovimientoMaterialService;
 import cava.model.service.PartidaService;
 import jakarta.transaction.Transactional;
 
 
 @RestController
-@RequestMapping("/api/movimiento_botella")
+@RequestMapping("/api/deguelle")
 @CrossOrigin(origins = "*")
-public class MovimientoBotellaController {
+public class DeguelleController {
 	
 	@Autowired
-	private MovimientoBotellaService mservice;
+	private DeguelleService mservice;
 	@Autowired
 	private MovimientoMaterialService mmservice;
 	@Autowired
@@ -60,11 +60,11 @@ public class MovimientoBotellaController {
     // Obtener todas las partidas
 	@GetMapping
 	public ResponseEntity<?> obtenerTodos() {
-	    List<MovimientoBotella> lista = mservice.buscarTodos();
-	    List<MovimientoBotellaDto> dtos = new ArrayList<>();
+	    List<Deguelle> lista = mservice.buscarTodos();
+	    List<DeguelleDto> dtos = new ArrayList<>();
 
-	    for (MovimientoBotella m : lista) {
-	        MovimientoBotellaDto dto = mapper.map(m, MovimientoBotellaDto.class);
+	    for (Deguelle m : lista) {
+	        DeguelleDto dto = mapper.map(m, DeguelleDto.class);
 	        dtos.add(dto);
 	    }
 
@@ -75,12 +75,12 @@ public class MovimientoBotellaController {
     // Obtener un movimiento
 	@GetMapping("/{id}")
 	public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
-	    MovimientoBotella movimiento = mservice.buscar(id);
+	    Deguelle movimiento = mservice.buscar(id);
 
 	    if (movimiento == null) {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento");
 	    } else {
-	        MovimientoBotellaDto dto = mapper.map(movimiento, MovimientoBotellaDto.class);
+	        DeguelleDto dto = mapper.map(movimiento, DeguelleDto.class);
 	        return ResponseEntity.ok(dto);
 	    }
 	}
@@ -89,7 +89,7 @@ public class MovimientoBotellaController {
     
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
-    	MovimientoBotella existente = mservice.buscar(id);
+    	Deguelle existente = mservice.buscar(id);
         if (existente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento con ID " + id);
         }
@@ -99,7 +99,7 @@ public class MovimientoBotellaController {
     
     @Transactional
     @PostMapping("/insertar")
-    public ResponseEntity<?> insertarUno(@RequestBody MovimientoBotellaDto dto) {
+    public ResponseEntity<?> insertarUno(@RequestBody DeguelleDto dto) {
 
         Partida partida = pservice.buscar(dto.getPartidaId());
         Cava cava = cservice.buscar(dto.getCavaId());
@@ -145,7 +145,7 @@ public class MovimientoBotellaController {
         
         pservice.insertar(partida);
 
-        MovimientoBotella movimiento = new MovimientoBotella();
+        Deguelle movimiento = new Deguelle();
         movimiento.setPartida(partida);
         movimiento.setCava(cava);
         movimiento.setFecha(dto.getFecha());
@@ -157,7 +157,7 @@ public class MovimientoBotellaController {
 
         movimiento = mservice.insertar(movimiento);
 
-        MovimientoBotellaDto nuevoDto = new MovimientoBotellaDto();
+        DeguelleDto nuevoDto = new DeguelleDto();
         nuevoDto.setId(movimiento.getId());
         nuevoDto.setFecha(movimiento.getFecha());
         nuevoDto.setDescripcion(movimiento.getDescripcion());

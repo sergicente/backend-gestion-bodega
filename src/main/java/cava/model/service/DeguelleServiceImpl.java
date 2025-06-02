@@ -5,34 +5,34 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import cava.model.entity.MovimientoBotella;
-import cava.model.repository.MovimientoBotellaRepository;
+import cava.model.entity.Deguelle;
+import cava.model.repository.DeguelleRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class MovimientoBotellaServiceImpl implements MovimientoBotellaService{
+public class DeguelleServiceImpl implements DeguelleService{
 	
 	@Autowired
-	private MovimientoBotellaRepository movbotrepo;
+	private DeguelleRepository movbotrepo;
 
 	@Override
-	public MovimientoBotella buscar(Long clave) {
+	public Deguelle buscar(Long clave) {
 		return movbotrepo.findById(clave).orElse(null);
 
 	}
 
 	@Override
-	public List<MovimientoBotella> buscarTodos() {
+	public List<Deguelle> buscarTodos() {
 		return movbotrepo.findAll();
 	}
 
 	@Override
-	public MovimientoBotella insertar(MovimientoBotella movimiento) {
+	public Deguelle insertar(Deguelle movimiento) {
 	    return movbotrepo.save(movimiento);
 	}
 
 	@Override
-	public MovimientoBotella modificar(MovimientoBotella entidad) {
+	public Deguelle modificar(Deguelle entidad) {
 	    if(movbotrepo.existsById(entidad.getId())) {
 	        return movbotrepo.save(entidad);
 	    } else {

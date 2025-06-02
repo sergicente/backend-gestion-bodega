@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class MovimientoBotella {
+public class Deguelle {
 	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
