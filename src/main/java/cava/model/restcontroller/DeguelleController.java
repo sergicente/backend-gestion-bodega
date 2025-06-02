@@ -1,7 +1,9 @@
 package cava.model.restcontroller;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,19 +14,23 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.DeguelleDto;
+import cava.model.dto.MaterialDto;
 import cava.model.dto.MovimientoMaterialDto;
 import cava.model.entity.Cava;
+import cava.model.entity.CavaPartida;
 import cava.model.entity.Material;
 import cava.model.entity.MaterialCava;
 import cava.model.entity.Deguelle;
 import cava.model.entity.MovimientoMaterial;
 import cava.model.entity.Partida;
 import cava.model.entity.TipoMovimientoMaterial;
+import cava.model.service.CavaPartidaService;
 import cava.model.service.CavaService;
 import cava.model.service.MaterialCavaService;
 import cava.model.service.MaterialService;
@@ -51,6 +57,8 @@ public class DeguelleController {
 	private MaterialService matservice;
 	@Autowired
 	private MaterialCavaService mcservice;
+	@Autowired
+	private CavaPartidaService cpservice;
 	@Autowired
 	private ModelMapper mapper;
 	
@@ -95,6 +103,82 @@ public class DeguelleController {
         }
         mservice.borrar(id);
         return ResponseEntity.noContent().build();
+    }
+    
+    @Transactional
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleDto dto) {
+        Deguelle deguelle = mservice.buscar(id);
+        if (deguelle == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüelle no encontrado");
+        }
+
+        Partida partida = pservice.buscar(dto.getPartidaId());
+        Cava cava = cservice.buscar(dto.getCavaId());
+
+        Optional<CavaPartida> optionalRelacion = cpservice.buscarPorCavaYPartida(dto.getCavaId(), dto.getPartidaId());
+        if (optionalRelacion.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relación Cava-Partida no encontrada");
+        }
+
+        CavaPartida relacion = optionalRelacion.get();
+
+        int cantidadAnterior = deguelle.getCantidad();
+        int cantidadNueva = dto.getCantidad();
+        int diferencia = cantidadNueva - cantidadAnterior;
+
+        int cantidadVendida = relacion.getVendido();
+        if (cantidadNueva < cantidadVendida) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("No puedes reducir el degüelle por debajo de las botellas ya vendidas (" + cantidadVendida + ")");
+        }
+
+        // Verificar que haya suficientes botellas en rima para cubrir la diferencia
+        int nuevaCantidadRima = partida.getBotellasRima() - diferencia;
+        if (nuevaCantidadRima < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("No hay suficientes botellas en rima para esta operación");
+        }
+
+        // Actualizar partida
+        partida.setBotellasRima(nuevaCantidadRima);
+        partida.setBotellasStock(partida.getBotellasStock() + diferencia);
+        pservice.insertar(partida);
+
+        // Actualizar relación
+        relacion.setCantidad(cantidadNueva);
+        int stockRecalculado = cantidadNueva - cantidadVendida;
+        if (stockRecalculado < 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Stock negativo en la relación después de la modificación");
+        }
+        relacion.setCantidad(stockRecalculado);
+        cpservice.insertar(relacion);
+
+        // Actualizar degüelle
+        deguelle.setCantidad(cantidadNueva);
+        deguelle.setDescripcion(dto.getDescripcion());
+        deguelle.setFecha(dto.getFecha());
+        deguelle.setLot(dto.getLot());
+        deguelle.setEstadoAnterior(dto.getEstadoAnterior());
+        deguelle.setEstadoNuevo(dto.getEstadoNuevo());
+        deguelle.setPartida(partida);
+        deguelle.setCava(cava);
+
+        Deguelle actualizado = mservice.modificar(deguelle);
+
+        DeguelleDto respuesta = new DeguelleDto();
+        respuesta.setId(actualizado.getId());
+        respuesta.setCantidad(actualizado.getCantidad());
+        respuesta.setDescripcion(actualizado.getDescripcion());
+        respuesta.setFecha(actualizado.getFecha());
+        respuesta.setLot(actualizado.getLot());
+        respuesta.setPartidaId(partida.getId());
+        respuesta.setCavaId(cava.getId());
+        respuesta.setEstadoAnterior(actualizado.getEstadoAnterior());
+        respuesta.setEstadoNuevo(actualizado.getEstadoNuevo());
+
+        return ResponseEntity.ok(respuesta);
     }
     
     @Transactional
@@ -145,26 +229,26 @@ public class DeguelleController {
         
         pservice.insertar(partida);
 
-        Deguelle movimiento = new Deguelle();
-        movimiento.setPartida(partida);
-        movimiento.setCava(cava);
-        movimiento.setFecha(dto.getFecha());
-        movimiento.setDescripcion(dto.getDescripcion());
-        movimiento.setCantidad(dto.getCantidad());
-        movimiento.setLot(dto.getLot());
-        movimiento.setEstadoNuevo(dto.getEstadoNuevo());
-        movimiento.setEstadoAnterior(dto.getEstadoAnterior());
+        Deguelle deguelle = new Deguelle();
+        deguelle.setPartida(partida);
+        deguelle.setCava(cava);
+        deguelle.setFecha(dto.getFecha());
+        deguelle.setDescripcion(dto.getDescripcion());
+        deguelle.setCantidad(dto.getCantidad());
+        deguelle.setLot(dto.getLot());
+        deguelle.setEstadoNuevo(dto.getEstadoNuevo());
+        deguelle.setEstadoAnterior(dto.getEstadoAnterior());
 
-        movimiento = mservice.insertar(movimiento);
+        deguelle = mservice.insertar(deguelle);
 
-        DeguelleDto nuevoDto = new DeguelleDto();
-        nuevoDto.setId(movimiento.getId());
-        nuevoDto.setFecha(movimiento.getFecha());
-        nuevoDto.setDescripcion(movimiento.getDescripcion());
-        nuevoDto.setCantidad(movimiento.getCantidad());
-        nuevoDto.setPartidaId(partida.getId());
+        DeguelleDto deguelleDto = new DeguelleDto();
+        deguelleDto.setId(deguelle.getId());
+        deguelleDto.setFecha(deguelle.getFecha());
+        deguelleDto.setDescripcion(deguelle.getDescripcion());
+        deguelleDto.setCantidad(deguelle.getCantidad());
+        deguelleDto.setPartidaId(partida.getId());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(deguelleDto);
     }
     
 
