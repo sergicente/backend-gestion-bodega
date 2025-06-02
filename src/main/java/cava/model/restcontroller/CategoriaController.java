@@ -73,17 +73,10 @@ public class CategoriaController {
     @PostMapping("/insertar")
     public ResponseEntity<?> insertarUno(@RequestBody CategoriaDto dto) {
     	
-        if (dto.getId() == null) {
-            return ResponseEntity.badRequest().body("El ID es obligatorio");
-        }
 
-        if (catservice.buscar(dto.getId()) != null) {
-            return ResponseEntity.badRequest().body("Ya existe una categoria con ese ID");
-        }
 
         // Convertir DTO a entidad
         Categoria categoria = new Categoria();
-        categoria.setId(dto.getId());
         categoria.setNombre(dto.getNombre());
 
         // Guardar

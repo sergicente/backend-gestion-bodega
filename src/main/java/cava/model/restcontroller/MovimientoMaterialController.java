@@ -73,10 +73,6 @@ public class MovimientoMaterialController {
     public ResponseEntity<?> obtenerMovimientosDeUnArticulo(@PathVariable Long id) {
         List<MovimientoMaterial> movimientos = mservice.findByMaterialId(id);
 
-        if (movimientos.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentran movimientos para el material con ID: " + id);
-        }
-
         List<MovimientoMaterialDto> dtos = new ArrayList<>();
         for (MovimientoMaterial m : movimientos) {
             MovimientoMaterialDto dto = mapper.map(m, MovimientoMaterialDto.class);

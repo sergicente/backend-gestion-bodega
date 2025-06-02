@@ -21,4 +21,5 @@ public class MovimientoBotellaDto {
 	private String partidaId;
 	private String cavaId;
 	private String cavaNombre;
+	private boolean partidaEcologico;
 }
