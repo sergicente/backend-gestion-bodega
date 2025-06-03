@@ -22,4 +22,5 @@ public class DeguelleDto {
 	private String cavaId;
 	private String cavaNombre;
 	private boolean partidaEcologico;
+	private boolean cavaEcologico;
 }

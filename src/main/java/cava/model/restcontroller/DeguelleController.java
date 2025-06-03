@@ -115,6 +115,9 @@ public class DeguelleController {
 
         Partida partida = pservice.buscar(dto.getPartidaId());
         Cava cava = cservice.buscar(dto.getCavaId());
+        
+        int cantidadMaterialOriginal = deguelle.getCantidad();
+        int cantidadMaterialNueva = dto.getCantidad();
 
         Optional<CavaPartida> optionalRelacion = cpservice.buscarPorCavaYPartida(dto.getCavaId(), dto.getPartidaId());
         if (optionalRelacion.isEmpty()) {
@@ -145,14 +148,13 @@ public class DeguelleController {
         partida.setBotellasStock(partida.getBotellasStock() + diferencia);
         pservice.insertar(partida);
 
-        // Actualizar relación
-        relacion.setCantidad(cantidadNueva);
+     // Actualizar relación
         int stockRecalculado = cantidadNueva - cantidadVendida;
         if (stockRecalculado < 0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body("Stock negativo en la relación después de la modificación");
         }
-        relacion.setCantidad(stockRecalculado);
+        relacion.setCantidad(stockRecalculado);  // cantidad = stock actual (degüelladas - vendidas)
         cpservice.insertar(relacion);
 
         // Actualizar degüelle
@@ -166,6 +168,44 @@ public class DeguelleController {
         deguelle.setCava(cava);
 
         Deguelle actualizado = mservice.modificar(deguelle);
+        
+        
+        
+        
+        // Restar materiales
+        
+        List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
+        for(MaterialCava mat : lista) {
+            Material material = mat.getMaterial();
+
+           
+
+            int cantidadARestaurar = Math.round(material.getCantidadGastada() * cantidadMaterialOriginal);
+            int cantidadANuevaSalida = Math.round(material.getCantidadGastada() * cantidadMaterialNueva);
+
+            int diferenciaMaterial = cantidadARestaurar - cantidadANuevaSalida;
+            int nuevoStock = material.getCantidad() + diferenciaMaterial;
+
+            if(nuevoStock < 0 ) {
+                throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
+            }
+
+            material.setCantidad(nuevoStock);
+            matservice.insertar(material);
+
+            if (diferenciaMaterial != 0) {
+                MovimientoMaterial mov = new MovimientoMaterial();
+                mov.setFecha(dto.getFecha());
+                mov.setTipo(diferenciaMaterial > 0 ? TipoMovimientoMaterial.ENTRADA : TipoMovimientoMaterial.SALIDA);
+                mov.setDescripcion("Ajuste por modificación de degüelle (" + deguelle.getLot() + ")");
+                mov.setCantidad(Math.abs(diferenciaMaterial));
+                mov.setMaterial(material);
+                mov.setStockResultante(nuevoStock);
+                mmservice.insertar(mov);
+            }
+        }
+        
+        
 
         DeguelleDto respuesta = new DeguelleDto();
         respuesta.setId(actualizado.getId());
