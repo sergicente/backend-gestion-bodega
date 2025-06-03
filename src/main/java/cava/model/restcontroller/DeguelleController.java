@@ -1,8 +1,10 @@
 package cava.model.restcontroller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -39,12 +41,11 @@ import cava.model.service.MovimientoMaterialService;
 import cava.model.service.PartidaService;
 import jakarta.transaction.Transactional;
 
-
 @RestController
 @RequestMapping("/api/deguelle")
 @CrossOrigin(origins = "*")
 public class DeguelleController {
-	
+
 	@Autowired
 	private DeguelleService mservice;
 	@Autowired
@@ -61,235 +62,246 @@ public class DeguelleController {
 	private CavaPartidaService cpservice;
 	@Autowired
 	private ModelMapper mapper;
-	
-	
-	
-	
-    // Obtener todas las partidas
+
+	// Obtener todas las partidas
 	@GetMapping
 	public ResponseEntity<?> obtenerTodos() {
-	    List<Deguelle> lista = mservice.buscarTodos();
-	    List<DeguelleDto> dtos = new ArrayList<>();
+		List<Deguelle> lista = mservice.buscarTodos();
+		List<DeguelleDto> dtos = new ArrayList<>();
 
-	    for (Deguelle m : lista) {
-	        DeguelleDto dto = mapper.map(m, DeguelleDto.class);
-	        dtos.add(dto);
-	    }
+		for (Deguelle m : lista) {
+			DeguelleDto dto = mapper.map(m, DeguelleDto.class);
+			dtos.add(dto);
+		}
 
-	    return ResponseEntity.ok(dtos);
+		return ResponseEntity.ok(dtos);
 	}
-    
-    
-    // Obtener un movimiento
+
+	// Obtener un movimiento
 	@GetMapping("/{id}")
 	public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
-	    Deguelle movimiento = mservice.buscar(id);
+		Deguelle movimiento = mservice.buscar(id);
 
-	    if (movimiento == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento");
-	    } else {
-	        DeguelleDto dto = mapper.map(movimiento, DeguelleDto.class);
-	        return ResponseEntity.ok(dto);
+		if (movimiento == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento");
+		} else {
+			DeguelleDto dto = mapper.map(movimiento, DeguelleDto.class);
+			return ResponseEntity.ok(dto);
+		}
+	}
+
+	@Transactional
+	@PostMapping("/insertar")
+	public ResponseEntity<?> insertarUno(@RequestBody DeguelleDto dto) {
+
+		Partida partida = pservice.buscar(dto.getPartidaId());
+		Cava cava = cservice.buscar(dto.getCavaId());
+
+		// Actualizar estado anterior (resta)
+		int nuevaCantidadRima = partida.getBotellasRima() - dto.getCantidad();
+		if (nuevaCantidadRima < 0) {
+			throw new IllegalArgumentException("No hay suficientes botellas en rima");
+		}
+		partida.setBotellasRima(nuevaCantidadRima);
+
+		// Actualizar estado nuevo (suma)
+
+		partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
+
+		// Restar materiales
+
+		List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
+		for (MaterialCava mat : lista) {
+			Material material = mat.getMaterial();
+			int cantidadARestar = Math.round(mat.getMaterial().getCantidadGastada() * dto.getCantidad());
+			int nuevoStock = material.getCantidad() - cantidadARestar;
+			if (nuevoStock < 0) {
+				throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
+			}
+			material.setCantidad(nuevoStock);
+			matservice.insertar(material);
+
+			MovimientoMaterial mov = new MovimientoMaterial();
+			mov.setFecha(dto.getFecha());
+			mov.setTipo(TipoMovimientoMaterial.SALIDA);
+			mov.setDescripcion(
+					"Degüelle " + dto.getCantidad() + " botellas de " + cava.getNombre() + " (" + dto.getLot() + ")");
+			mov.setCantidad(cantidadARestar);
+			mov.setMaterial(material);
+			mov.setStockResultante(nuevoStock);
+			mmservice.insertar(mov);
+
+		}
+
+		pservice.insertar(partida);
+
+		Deguelle deguelle = new Deguelle();
+		deguelle.setPartida(partida);
+		deguelle.setCava(cava);
+		deguelle.setFecha(dto.getFecha());
+		deguelle.setDescripcion(dto.getDescripcion());
+		deguelle.setCantidad(dto.getCantidad());
+		deguelle.setLot(dto.getLot());
+		deguelle.setEstadoNuevo(dto.getEstadoNuevo());
+		deguelle.setEstadoAnterior(dto.getEstadoAnterior());
+
+		deguelle = mservice.insertar(deguelle);
+
+		DeguelleDto deguelleDto = new DeguelleDto();
+		deguelleDto.setId(deguelle.getId());
+		deguelleDto.setFecha(deguelle.getFecha());
+		deguelleDto.setDescripcion(deguelle.getDescripcion());
+		deguelleDto.setCantidad(deguelle.getCantidad());
+		deguelleDto.setPartidaId(partida.getId());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(deguelleDto);
+	}
+
+	@Transactional
+	@PutMapping("/modificar/{id}")
+	public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleDto dto) {
+	    try {
+	        // Obtener degüelle original
+	        Deguelle degOriginal = mservice.buscar(id);
+	        if (degOriginal == null) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüellé no encontrado");
+	        }
+
+	        // 1. Verificaciones previas antes de modificar nada
+	        try {
+	            verificarReversionPosible(degOriginal);
+	            verificarStockMateriales(dto, degOriginal.getCantidad());
+	        } catch (IllegalArgumentException ex) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("No se puede modificar el degüellé: " + ex.getMessage());
+	        }
+
+	        // 2. Revertir degüelle anterior
+	        borrar(id);
+
+	        // 3. Actualizar o crear nueva relación Cava-Partida
+	        Partida nuevaPartida = pservice.buscar(dto.getPartidaId());
+	        Cava nuevaCava = cservice.buscar(dto.getCavaId());
+
+	        Optional<CavaPartida> relacionNuevaOpt = cpservice.buscarPorCavaYPartida(nuevaCava.getId(), nuevaPartida.getId());
+	        CavaPartida nuevaRelacion;
+
+	        if (relacionNuevaOpt.isPresent()) {
+	            nuevaRelacion = relacionNuevaOpt.get();
+	            nuevaRelacion.setCantidad(nuevaRelacion.getCantidad() + dto.getCantidad());
+	        } else {
+	            nuevaRelacion = new CavaPartida();
+	            nuevaRelacion.setCava(nuevaCava);
+	            nuevaRelacion.setPartida(nuevaPartida);
+	            nuevaRelacion.setCantidad(dto.getCantidad());
+	            nuevaRelacion.setVendido(0);
+	            nuevaRelacion.setActual(true);
+	            nuevaRelacion.setUltimaActualizacion(LocalDateTime.now());
+	        }
+	        cpservice.insertar(nuevaRelacion);
+
+	        // 4. Insertar nuevo degüelle
+	        return insertarUno(dto);
+
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	            .body("Error al modificar el degüellé: " + e.getMessage());
 	    }
 	}
 
-    
-    
-    @DeleteMapping("/borrar/{id}")
-    public ResponseEntity<?> borrar(@PathVariable Long id) {
-    	Deguelle existente = mservice.buscar(id);
-        if (existente == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento con ID " + id);
-        }
-        mservice.borrar(id);
-        return ResponseEntity.noContent().build();
-    }
-    
-    @Transactional
-    @PutMapping("/modificar/{id}")
-    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleDto dto) {
-        Deguelle deguelle = mservice.buscar(id);
-        if (deguelle == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüelle no encontrado");
-        }
+	@Transactional
+	@DeleteMapping("/borrar/{id}")
+	public ResponseEntity<?> borrar(@PathVariable Long id) {
+	    Deguelle deguelle = mservice.buscar(id);
+	    if (deguelle == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüellé no encontrado");
+	    }
 
-        Partida partida = pservice.buscar(dto.getPartidaId());
-        Cava cava = cservice.buscar(dto.getCavaId());
-        
-        int cantidadMaterialOriginal = deguelle.getCantidad();
-        int cantidadMaterialNueva = dto.getCantidad();
+	    try {
+	        verificarReversionPosible(deguelle);
 
-        Optional<CavaPartida> optionalRelacion = cpservice.buscarPorCavaYPartida(dto.getCavaId(), dto.getPartidaId());
-        if (optionalRelacion.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relación Cava-Partida no encontrada");
-        }
+	        // 1. DESHACER DEGUELLE ANTERIOR
+	        Partida partidaAnterior = deguelle.getPartida();
+	        Cava cavaAnterior = deguelle.getCava();
+	        int cantidadAnterior = deguelle.getCantidad();
 
-        CavaPartida relacion = optionalRelacion.get();
+	        partidaAnterior.setBotellasRima(partidaAnterior.getBotellasRima() + cantidadAnterior);
+	        partidaAnterior.setBotellasStock(partidaAnterior.getBotellasStock() - cantidadAnterior);
+	        pservice.insertar(partidaAnterior);
 
-        int cantidadAnterior = deguelle.getCantidad();
-        int cantidadNueva = dto.getCantidad();
-        int diferencia = cantidadNueva - cantidadAnterior;
+	        Optional<CavaPartida> relacionAnterior = cpservice.buscarPorCavaYPartida(cavaAnterior.getId(), partidaAnterior.getId());
+	        if (relacionAnterior.isPresent()) {
+	            CavaPartida relacion = relacionAnterior.get();
+	            relacion.setCantidad(relacion.getCantidad() - cantidadAnterior);
+	            cpservice.insertar(relacion);
+	        }
 
-        int cantidadVendida = relacion.getVendido();
-        if (cantidadNueva < cantidadVendida) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("No puedes reducir el degüelle por debajo de las botellas ya vendidas (" + cantidadVendida + ")");
-        }
+	        List<MaterialCava> materiales = mcservice.findByCavaId(cavaAnterior.getId());
+	        for (MaterialCava mat : materiales) {
+	            Material material = mat.getMaterial();
+	            int cantidadADevolver = Math.round(mat.getMaterial().getCantidadGastada() * cantidadAnterior);
+	            material.setCantidad(material.getCantidad() + cantidadADevolver);
+	            matservice.insertar(material);
 
-        // Verificar que haya suficientes botellas en rima para cubrir la diferencia
-        int nuevaCantidadRima = partida.getBotellasRima() - diferencia;
-        if (nuevaCantidadRima < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("No hay suficientes botellas en rima para esta operación");
-        }
+	            MovimientoMaterial entrada = new MovimientoMaterial();
+	            entrada.setFecha(deguelle.getFecha());
+	            entrada.setTipo(TipoMovimientoMaterial.ENTRADA);
+	            entrada.setDescripcion("Reversión degüelle modificado (" + deguelle.getLot() + ")");
+	            entrada.setCantidad(cantidadADevolver);
+	            entrada.setMaterial(material);
+	            entrada.setStockResultante(material.getCantidad());
+	            mmservice.insertar(entrada);
+	        }
 
-        // Actualizar partida
-        partida.setBotellasRima(nuevaCantidadRima);
-        partida.setBotellasStock(partida.getBotellasStock() + diferencia);
-        pservice.insertar(partida);
+	        mservice.borrar(id);
 
-     // Actualizar relación
-        int stockRecalculado = cantidadNueva - cantidadVendida;
-        if (stockRecalculado < 0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body("Stock negativo en la relación después de la modificación");
-        }
-        relacion.setCantidad(stockRecalculado);  // cantidad = stock actual (degüelladas - vendidas)
-        cpservice.insertar(relacion);
+	        return ResponseEntity.ok(Map.of("mensaje", "Degüelle borrado correctamente"));
 
-        // Actualizar degüelle
-        deguelle.setCantidad(cantidadNueva);
-        deguelle.setDescripcion(dto.getDescripcion());
-        deguelle.setFecha(dto.getFecha());
-        deguelle.setLot(dto.getLot());
-        deguelle.setEstadoAnterior(dto.getEstadoAnterior());
-        deguelle.setEstadoNuevo(dto.getEstadoNuevo());
-        deguelle.setPartida(partida);
-        deguelle.setCava(cava);
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("No se puede deshacer el degüellé: " + e.getMessage());
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body("Error al modificar el degüellé: " + e.getMessage());
+	    }
+	}
+	
+	
+	private void verificarStockMateriales(DeguelleDto dto, int cantidadYaDescontada) {
+	    List<MaterialCava> materiales = mcservice.findByCavaId(dto.getCavaId());
+	    for (MaterialCava mat : materiales) {
+	        Material material = mat.getMaterial();
+	        int cantidadARestar = Math.round(material.getCantidadGastada() * dto.getCantidad());
+	        int cantidadRealDisponible = material.getCantidad() + Math.round(material.getCantidadGastada() * cantidadYaDescontada);
 
-        Deguelle actualizado = mservice.modificar(deguelle);
-        
-        
-        
-        
-        // Restar materiales
-        
-        List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
-        for(MaterialCava mat : lista) {
-            Material material = mat.getMaterial();
+	        if (cantidadRealDisponible < cantidadARestar) {
+	            throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
+	        }
+	    }
+	}
+	
+	private void verificarReversionPosible(Deguelle deg) {
+	    Partida partida = deg.getPartida();
+	    Cava cava = deg.getCava();
+	    int cantidadAEliminar = deg.getCantidad();
 
-           
+	    // Buscar relación
+	    Optional<CavaPartida> relacionOpt = cpservice.buscarPorCavaYPartida(cava.getId(), partida.getId());
+	    if (relacionOpt.isEmpty()) return;
 
-            int cantidadARestaurar = Math.round(material.getCantidadGastada() * cantidadMaterialOriginal);
-            int cantidadANuevaSalida = Math.round(material.getCantidadGastada() * cantidadMaterialNueva);
+	    CavaPartida cp = relacionOpt.get();
 
-            int diferenciaMaterial = cantidadARestaurar - cantidadANuevaSalida;
-            int nuevoStock = material.getCantidad() + diferenciaMaterial;
+	    // Calcular el total de botellas degüelladas para esa combinación
+	    List<Deguelle> deguellesRelacionados = mservice.buscarPorCavaYPartida(cava.getId(), partida.getId());
+	    int totalDeguellado = deguellesRelacionados.stream()
+	        .mapToInt(Deguelle::getCantidad)
+	        .sum();
 
-            if(nuevoStock < 0 ) {
-                throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
-            }
+	    int nuevoTotalDeguellado = totalDeguellado - cantidadAEliminar;
 
-            material.setCantidad(nuevoStock);
-            matservice.insertar(material);
-
-            if (diferenciaMaterial != 0) {
-                MovimientoMaterial mov = new MovimientoMaterial();
-                mov.setFecha(dto.getFecha());
-                mov.setTipo(diferenciaMaterial > 0 ? TipoMovimientoMaterial.ENTRADA : TipoMovimientoMaterial.SALIDA);
-                mov.setDescripcion("Ajuste por modificación de degüelle (" + deguelle.getLot() + ")");
-                mov.setCantidad(Math.abs(diferenciaMaterial));
-                mov.setMaterial(material);
-                mov.setStockResultante(nuevoStock);
-                mmservice.insertar(mov);
-            }
-        }
-        
-        
-
-        DeguelleDto respuesta = new DeguelleDto();
-        respuesta.setId(actualizado.getId());
-        respuesta.setCantidad(actualizado.getCantidad());
-        respuesta.setDescripcion(actualizado.getDescripcion());
-        respuesta.setFecha(actualizado.getFecha());
-        respuesta.setLot(actualizado.getLot());
-        respuesta.setPartidaId(partida.getId());
-        respuesta.setCavaId(cava.getId());
-        respuesta.setEstadoAnterior(actualizado.getEstadoAnterior());
-        respuesta.setEstadoNuevo(actualizado.getEstadoNuevo());
-
-        return ResponseEntity.ok(respuesta);
-    }
-    
-    @Transactional
-    @PostMapping("/insertar")
-    public ResponseEntity<?> insertarUno(@RequestBody DeguelleDto dto) {
-
-        Partida partida = pservice.buscar(dto.getPartidaId());
-        Cava cava = cservice.buscar(dto.getCavaId());
-        
-        // Actualizar estado anterior (resta)
-        int nuevaCantidadRima = partida.getBotellasRima() - dto.getCantidad();
-        if (nuevaCantidadRima < 0) {
-            throw new IllegalArgumentException("No hay suficientes botellas en rima");
-        }
-        partida.setBotellasRima(nuevaCantidadRima);
-        
-        
-        
-        // Actualizar estado nuevo (suma)
-
-        partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
-        
-        // Restar materiales
-        
-        List<MaterialCava> lista = mcservice.findByCavaId(dto.getCavaId());
-        for(MaterialCava mat : lista) {
-        	Material material = mat.getMaterial();
-        	int cantidadARestar = Math.round(mat.getMaterial().getCantidadGastada() * dto.getCantidad());
-        	int nuevoStock = material.getCantidad() - cantidadARestar;
-        	if(nuevoStock < 0 ) {
-        		throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
-        	}
-        	material.setCantidad(nuevoStock);
-        	matservice.insertar(material);
-        	
-        	MovimientoMaterial mov = new MovimientoMaterial();
-        	mov.setFecha(dto.getFecha());
-        	mov.setTipo(TipoMovimientoMaterial.SALIDA);
-        	mov.setDescripcion("Degüelle " + dto.getCantidad() + " botellas de " + cava.getNombre() + " (" + dto.getLot() + ")");
-        	mov.setCantidad(cantidadARestar);
-        	mov.setMaterial(material);
-        	mov.setStockResultante(nuevoStock);
-        	mmservice.insertar(mov);
-        	
-        
-        }
-                
-        
-        pservice.insertar(partida);
-
-        Deguelle deguelle = new Deguelle();
-        deguelle.setPartida(partida);
-        deguelle.setCava(cava);
-        deguelle.setFecha(dto.getFecha());
-        deguelle.setDescripcion(dto.getDescripcion());
-        deguelle.setCantidad(dto.getCantidad());
-        deguelle.setLot(dto.getLot());
-        deguelle.setEstadoNuevo(dto.getEstadoNuevo());
-        deguelle.setEstadoAnterior(dto.getEstadoAnterior());
-
-        deguelle = mservice.insertar(deguelle);
-
-        DeguelleDto deguelleDto = new DeguelleDto();
-        deguelleDto.setId(deguelle.getId());
-        deguelleDto.setFecha(deguelle.getFecha());
-        deguelleDto.setDescripcion(deguelle.getDescripcion());
-        deguelleDto.setCantidad(deguelle.getCantidad());
-        deguelleDto.setPartidaId(partida.getId());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(deguelleDto);
-    }
-    
+	    if (nuevoTotalDeguellado < cp.getVendido()) {
+	        throw new IllegalArgumentException("No se puede eliminar este degüelle porque dejaría ventas sin cubrir");
+	    }
+	}
 
 }

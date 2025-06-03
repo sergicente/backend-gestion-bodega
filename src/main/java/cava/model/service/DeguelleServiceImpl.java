@@ -1,10 +1,12 @@
 package cava.model.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import cava.model.entity.CavaPartida;
 import cava.model.entity.Deguelle;
 import cava.model.repository.DeguelleRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -45,6 +47,11 @@ public class DeguelleServiceImpl implements DeguelleService{
 	    if (movbotrepo.existsById(clave)) {
 	    	movbotrepo.deleteById(clave);
 	    }
+	}
+
+	@Override
+	public List<Deguelle> buscarPorCavaYPartida(String cavaId, String partidaId) {
+	    return movbotrepo.findByCavaIdAndPartidaId(cavaId, partidaId);
 	}
 
 
