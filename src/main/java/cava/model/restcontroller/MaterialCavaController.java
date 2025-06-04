@@ -92,7 +92,6 @@ public class MaterialCavaController {
 	        MaterialCava nuevaRelacion = new MaterialCava();
 	        nuevaRelacion.setCava(cava);
 	        nuevaRelacion.setMaterial(material);
-	        nuevaRelacion.setCantidadNecesariaPorBotella(1);
 
 	        MaterialCava guardado = mcservice.insertar(nuevaRelacion);
 

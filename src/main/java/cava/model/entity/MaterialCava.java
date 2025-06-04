@@ -28,6 +28,5 @@ public class MaterialCava {
     @JoinColumn(name = "material_id", nullable = false)
     private Material material;
     
-    private float cantidadNecesariaPorBotella;
 
 }

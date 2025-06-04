@@ -33,6 +33,10 @@ public class MovimientoMaterial {
     @ManyToOne
     @JoinColumn(name = "material_id")
 	private Material material;
+    
+    @ManyToOne
+    @JoinColumn(name = "deguelle_id")
+    private Deguelle deguelle;
 	
     private int stockResultante;
 

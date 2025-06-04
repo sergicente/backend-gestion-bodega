@@ -8,4 +8,5 @@ import cava.model.entity.MovimientoMaterial;
 
 public interface MovimientoMaterialRepository extends JpaRepository<MovimientoMaterial, Long>{
 	List<MovimientoMaterial> findByMaterialId(Long id);
+	List<MovimientoMaterial> findByDeguelleId(Long id);
 }

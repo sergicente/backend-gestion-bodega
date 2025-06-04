@@ -52,4 +52,9 @@ public class MovimientoMaterialServiceImpl implements MovimientoMaterialService{
 		return movmatrepo.findByMaterialId(id);
 	}
 
+	@Override
+	public List<MovimientoMaterial> findByDeguelleId(Long id) {
+		return movmatrepo.findByDeguelleId(id);
+	}
+
 }

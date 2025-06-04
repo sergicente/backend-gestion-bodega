@@ -73,10 +73,10 @@ public class ResetService {
         
         
         // Insertar partidas de ejemplo
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, false, "Verde", "Corona", "Celler Piñol", "Xarel·lo", "Macabeu", "Parellada", null);
-        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "Xarel·lo", "Macabeu", "Parellada", null);
-        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "Xarel·lo", "Macabeu", "Parellada", null);
-        Partida p4 = new Partida("22PIN", LocalDate.of(2023, 1, 15), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "Xarel·lo", "Macabeu", "Parellada", null);
+        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", " 25% Parellada", null);
+        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null);
+        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null);
+        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, true, "Verde", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null);
 
         partidaRepo.saveAll(List.of(p1, p2, p3, p4));
         
@@ -110,31 +110,31 @@ public class ResetService {
         Categoria c3 = new Categoria(null, "Cajas");
         catRepo.saveAll(List.of(c1, c2, c3));
         
-        Material m1 = new Material(null, "Cápsula Mas Xarot", c1, f2, "Cápsula para Brut", 10000, 0);
-        Material m2 = new Material(null, "Etiqueta Mas Xarot", c2, f2, "Etiqueta blanca frontal", 10000, 0);
-        Material m3 = new Material(null, "Caja 6 botellas Mas Xarot", c3, f2, "Caja kraft Mas Xarot", 1000, 0);
-        Material m4 = new Material(null, "Caja 6 botellas Montsant", c3, f1, "Caja kraft Montsant", 1000, 0);
+        Material m1 = new Material(null, "Cápsula Mas Xarot", c1, f2, null, 10000, 1f);
+        Material m2 = new Material(null, "Etiqueta Mas Xarot", c2, f2, null, 10000, 1f);
+        Material m3 = new Material(null, "Caja Mas Xarot", c3, f2, null, 1000, 0.17f);
+        Material m4 = new Material(null, "Caja Montsant", c3, f1, null, 1000, 0.17f);
 
 
         matRepo.saveAll(List.of(m1, m2, m3, m4));
         
      // Mas Xarot Brut
-        MaterialCava mc1 = new MaterialCava(null, cava1, m1, 1f);        // 1 cápsula por botella
-        MaterialCava mc2 = new MaterialCava(null, cava1, m2, 1f);        // 1 etiqueta por botella
-        MaterialCava mc3 = new MaterialCava(null, cava1, m3, 1f / 6f);   // 1 caja cada 6 botellas
+        MaterialCava mc1 = new MaterialCava(null, cava1, m1);        // 1 cápsula por botella
+        MaterialCava mc2 = new MaterialCava(null, cava1, m2);        // 1 etiqueta por botella
+        MaterialCava mc3 = new MaterialCava(null, cava1, m3);   // 1 caja cada 6 botellas
 
         // Mas Xarot Brut Nature
-        MaterialCava mc4 = new MaterialCava(null, cava2, m1, 1f);
-        MaterialCava mc5 = new MaterialCava(null, cava2, m2, 1f);
-        MaterialCava mc6 = new MaterialCava(null, cava2, m3, 1f / 6f);
+        MaterialCava mc4 = new MaterialCava(null, cava2, m1);
+        MaterialCava mc5 = new MaterialCava(null, cava2, m2);
+        MaterialCava mc6 = new MaterialCava(null, cava2, m3);
 
         // Mas Xarot Enoteca
-        MaterialCava mc7 = new MaterialCava(null, cava3, m1, 1f);
-        MaterialCava mc8 = new MaterialCava(null, cava3, m2, 1f);
-        MaterialCava mc9 = new MaterialCava(null, cava3, m3, 1f / 6f);
+        MaterialCava mc7 = new MaterialCava(null, cava3, m1);
+        MaterialCava mc8 = new MaterialCava(null, cava3, m2);
+        MaterialCava mc9 = new MaterialCava(null, cava3, m3);
 
         // Montsant Artesà
-        MaterialCava mc10 = new MaterialCava(null, cava4, m4, 1f / 6f);
+        MaterialCava mc10 = new MaterialCava(null, cava4, m4);
 
         mcRepo.saveAll(List.of(mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10));
 //        // Insertar datos de ejemplo
