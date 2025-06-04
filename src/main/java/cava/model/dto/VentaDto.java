@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VentaDto {
-    private Long id;
+    private String id;
     private int ano;
     private Trimestre trimestre;
     private int cantidad;

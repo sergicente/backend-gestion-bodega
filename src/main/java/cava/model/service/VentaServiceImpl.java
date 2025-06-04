@@ -18,7 +18,7 @@ public class VentaServiceImpl implements VentaService{
 	private VentaRepository vrepo;
 
 	@Override
-	public Venta buscar(Long clave) {
+	public Venta buscar(String clave) {
 		return vrepo.findById(clave).orElse(null);
 
 	}
@@ -44,7 +44,7 @@ public class VentaServiceImpl implements VentaService{
 	}
 
 	@Override
-	public void borrar(Long clave) {
+	public void borrar(String clave) {
 	    if (vrepo.existsById(clave)) {
 	    	vrepo.deleteById(clave);
 	    }

@@ -196,25 +196,29 @@ public class CavaPartidaController {
     ) {
         CavaPartida cp = cpservice.buscar(id);
         int disponibles = cp.getCantidad();
-        int vendidas = request.getUnidades();
-        
-        if (vendidas < 0) {
-            return ResponseEntity.badRequest().body("La cantidad vendida debe ser positiva");
+        int vendidasNueva = request.getUnidades();
+        int vendidasPrevias = request.getUnidadesPrevias();
+
+        int diferencia = vendidasNueva - vendidasPrevias;
+
+        if (diferencia < 0 && Math.abs(diferencia) > cp.getVendido()) {
+            return ResponseEntity.badRequest().body("No se puede revertir más de lo vendido.");
         }
 
-        if (vendidas > disponibles) {
-            return ResponseEntity.badRequest().body("No hay suficiente stock.");
+        if (diferencia > disponibles) {
+            return ResponseEntity.badRequest().body("No hay suficiente stock disponible.");
         }
-        
-        cp.setCantidad(disponibles - vendidas);
-        cp.setVendido(cp.getVendido() + vendidas);
+
+        cp.setCantidad(disponibles - diferencia);
+        cp.setVendido(cp.getVendido() + diferencia);
         cp.setUltimaActualizacion(LocalDateTime.now());
-        
+
         Partida partida = cp.getPartida();
-        partida.setBotellasStock(partida.getBotellasStock() - vendidas);
-        partida.setBotellasVendidas(partida.getBotellasVendidas() + vendidas);
+        partida.setBotellasStock(partida.getBotellasStock() - diferencia);
+        partida.setBotellasVendidas(partida.getBotellasVendidas() + diferencia);
+
         cpservice.modificar(cp);
-        
+
         Map<String, Object> body = new HashMap<>();
         body.put("mensaje", "Stock actualizado");
         body.put("nuevoStock", cp.getCantidad());
@@ -223,5 +227,7 @@ public class CavaPartidaController {
         CavaPartidaDto dto = mapper.map(cp, CavaPartidaDto.class);
         return ResponseEntity.ok(dto);
     }
+    
+
     
 }

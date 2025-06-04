@@ -9,4 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class VentaRequestDto {
     private int unidades;
+    private int unidadesPrevias;
+
 }

@@ -49,7 +49,7 @@ public class VentaController {
     
     
     @GetMapping("/{id}")
-    public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
+    public ResponseEntity<?> obtenerUno(@PathVariable String id) {
         Venta venta = vservice.buscar(id);
         if (venta == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
@@ -77,7 +77,7 @@ public class VentaController {
     
     
     @PutMapping("/modificar/{id}")
-    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody VentaDto dto) {
+    public ResponseEntity<?> modificar(@PathVariable String id, @RequestBody VentaDto dto) {
         if (!id.equals(dto.getId())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID en la URL y en el cuerpo no coinciden");
         }
@@ -92,7 +92,7 @@ public class VentaController {
 	
 	// Borrar una venta
 	@DeleteMapping("/borrar/{id}")
-	public ResponseEntity<?> borrar(@PathVariable Long id) {
+	public ResponseEntity<?> borrar(@PathVariable String id) {
 		Venta existente = vservice.buscar(id);
 		if(existente == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la partida");
