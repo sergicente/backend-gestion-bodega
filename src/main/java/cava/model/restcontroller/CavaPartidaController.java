@@ -79,6 +79,17 @@ public class CavaPartidaController {
 
 	    return ResponseEntity.ok(relacionesDto);
 	}
+	
+	@GetMapping("/relacion/{id}")
+	public ResponseEntity<?> obtenerRelacionPorId(@PathVariable Long id) {
+	    CavaPartida relacion = cpservice.buscar(id);
+	    CavaPartidaDto relacionDto = mapper.map(relacion, CavaPartidaDto.class);
+	    if (relacion != null) {
+	        return ResponseEntity.ok(relacionDto);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Relación no encontrada");
+	    }
+	}
 
 	@PostMapping("/{idCava}/{idPartida}")
 	public ResponseEntity<?> asignarPartida(
@@ -187,8 +198,8 @@ public class CavaPartidaController {
         int disponibles = cp.getCantidad();
         int vendidas = request.getUnidades();
         
-        if (vendidas <= 0) {
-            return ResponseEntity.badRequest().body("La cantidad vendida debe ser mayor que cero.");
+        if (vendidas < 0) {
+            return ResponseEntity.badRequest().body("La cantidad vendida debe ser positiva");
         }
 
         if (vendidas > disponibles) {

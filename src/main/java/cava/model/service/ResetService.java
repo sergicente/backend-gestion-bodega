@@ -24,7 +24,7 @@ import cava.model.repository.MaterialCavaRepository;
 import cava.model.repository.MaterialRepository;
 import cava.model.repository.MovimientoMaterialRepository;
 import cava.model.repository.PartidaRepository;
-
+import cava.model.repository.VentaRepository;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -57,10 +57,14 @@ public class ResetService {
     
     @Autowired
     private CategoriaRepository catRepo;
+    
+    @Autowired
+    private VentaRepository vRepo;
 
     @Transactional
     public void reiniciarBaseDeDatos() {
         // Borrar en el orden correcto por dependencias
+    	vRepo.deleteAll();
         mcRepo.deleteAll(); 
         mmRepo.deleteAll(); 
         matRepo.deleteAll();
