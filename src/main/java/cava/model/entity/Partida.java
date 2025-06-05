@@ -25,7 +25,7 @@ public class Partida {
     private int botellasRima;
     private int botellasStock;
     private int botellasVendidas;
-    
+    private int botellasMerma;
     private boolean ecologico;
     private String botella;
     private String tapon;

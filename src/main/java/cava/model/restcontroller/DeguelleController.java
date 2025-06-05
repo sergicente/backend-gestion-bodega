@@ -98,13 +98,14 @@ public class DeguelleController {
 	    Cava cava = cservice.buscar(dto.getCavaId());
 
 	    // Validar stock en rima
-	    int nuevaCantidadRima = partida.getBotellasRima() - dto.getCantidad();
+	    int nuevaCantidadRima = partida.getBotellasRima() - dto.getCantidad() -dto.getMerma();
 	    if (nuevaCantidadRima < 0) {
 	        throw new IllegalArgumentException("No hay suficientes botellas en rima");
 	    }
 
 	    partida.setBotellasRima(nuevaCantidadRima);
 	    partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
+	    partida.setBotellasMerma(partida.getBotellasMerma()+ dto.getMerma());
 
 	    // Lista para acumular movimientos creados
 	    List<MovimientoMaterial> movimientosCreados = new ArrayList<>();
@@ -141,12 +142,12 @@ public class DeguelleController {
 	    deguelle.setPartida(partida);
 	    deguelle.setCava(cava);
 	    deguelle.setFecha(dto.getFecha());
-	    deguelle.setDescripcion(dto.getDescripcion());
 	    deguelle.setCantidad(dto.getCantidad());
+	    deguelle.setMerma(dto.getMerma());
 	    deguelle.setLot(dto.getLot());
-	    deguelle.setEstadoNuevo(dto.getEstadoNuevo());
-	    deguelle.setEstadoAnterior(dto.getEstadoAnterior());
-
+	    deguelle.setLimpieza(dto.isLimpieza());
+	    deguelle.setObservaciones(dto.getObservaciones());
+	    deguelle.setLicor(dto.getLicor());
 	    deguelle = mservice.insertar(deguelle);
 
 	    // Ahora actualizamos los movimientos con el degüelle creado
@@ -158,7 +159,6 @@ public class DeguelleController {
 	    DeguelleDto deguelleDto = new DeguelleDto();
 	    deguelleDto.setId(deguelle.getId());
 	    deguelleDto.setFecha(deguelle.getFecha());
-	    deguelleDto.setDescripcion(deguelle.getDescripcion());
 	    deguelleDto.setCantidad(deguelle.getCantidad());
 	    deguelleDto.setPartidaId(partida.getId());
 
@@ -294,9 +294,12 @@ public class DeguelleController {
 	        Partida partidaAnterior = deguelle.getPartida();
 	        Cava cavaAnterior = deguelle.getCava();
 	        int cantidadAnterior = deguelle.getCantidad();
+	        int mermaAnterior = deguelle.getMerma();
 
-	        partidaAnterior.setBotellasRima(partidaAnterior.getBotellasRima() + cantidadAnterior);
+	        partidaAnterior.setBotellasRima(partidaAnterior.getBotellasRima() + cantidadAnterior + mermaAnterior);
 	        partidaAnterior.setBotellasStock(partidaAnterior.getBotellasStock() - cantidadAnterior);
+	        partidaAnterior.setBotellasMerma(partidaAnterior.getBotellasMerma() - mermaAnterior);
+
 	        pservice.insertar(partidaAnterior);
 
 	        Optional<CavaPartida> relacionAnterior = cpservice.buscarPorCavaYPartida(cavaAnterior.getId(), partidaAnterior.getId());

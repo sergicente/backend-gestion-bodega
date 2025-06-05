@@ -77,10 +77,10 @@ public class ResetService {
         
         
         // Insertar partidas de ejemplo
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", " 25% Parellada", null);
-        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null);
-        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null);
-        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, true, "Verde", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null);
+        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", " 25% Parellada", null);
+        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null);
+        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null);
+        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, true, "Verde", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null);
 
         partidaRepo.saveAll(List.of(p1, p2, p3, p4));
         

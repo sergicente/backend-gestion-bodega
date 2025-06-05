@@ -25,18 +25,18 @@ public class Deguelle {
 	private Long id;
 
 	private LocalDate fecha;
-	
-	private String descripcion;
-	
+		
 	private String lot;
 	
 	private int cantidad;
-
-	@Enumerated(EnumType.STRING)
-	private EstadoBotella estadoAnterior;
-
-	@Enumerated(EnumType.STRING)
-	private EstadoBotella estadoNuevo;
+	
+	private int merma;
+	
+	private boolean limpieza;
+	
+	private String observaciones;
+	
+	private int licor;
 
 	@ManyToOne
 	@JoinColumn(name = "partida_id")
