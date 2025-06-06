@@ -1,9 +1,8 @@
 package cava.model.entity;
 
+import java.time.LocalDate;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,25 +16,25 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Material {
-	
+public class CompraMaterial {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
-
-    @ManyToOne
-    @JoinColumn(name = "categoria_id")
-    private Categoria categoria;
-    
-    @ManyToOne
-    @JoinColumn(name = "familia_id")
-    private Familia familia;
-
-    private String observaciones;
     private int cantidad;
-    private float cantidadGastada;
+
+    private double precioTotal;
+
+    private String descripcion;
     
-    
+    @ManyToOne
+    @JoinColumn(name = "proveedor_id", nullable = false)
+    private Proveedor proveedor;
+
+    private LocalDate fecha;
+
+    @ManyToOne
+    @JoinColumn(name = "material_id", nullable = false)
+    private Material material;
 }
