@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import cava.model.entity.CompraMaterial;
 import cava.model.entity.Familia;
+import cava.model.entity.MovimientoMaterial;
 import cava.model.repository.CompraMaterialRepository;
 import cava.model.repository.FamiliaRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -51,6 +52,11 @@ public class CompraMaterialServiceImpl implements CompraMaterialService{
 	    if (cmrepo.existsById(clave)) {
 	        cmrepo.deleteById(clave);
 	    }
+	}
+	
+	@Override
+	public List<CompraMaterial> findByMaterialId(Long id) {
+		return cmrepo.findByMaterialId(id);
 	}
 
 }

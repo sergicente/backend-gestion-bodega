@@ -19,5 +19,5 @@ public class MovimientoMaterialDto {
     private Long materialId;
     private String materialNombre;
     private int stockResultante;
-
+    private Long compraMaterialId;
 }

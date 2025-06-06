@@ -11,19 +11,25 @@ import org.springframework.stereotype.Service;
 import cava.model.entity.Categoria;
 import cava.model.entity.Cava;
 import cava.model.entity.CavaPartida;
+import cava.model.entity.CompraMaterial;
 import cava.model.entity.Familia;
 import cava.model.entity.Material;
 import cava.model.entity.MaterialCava;
+import cava.model.entity.MovimientoMaterial;
 import cava.model.entity.Partida;
+import cava.model.entity.Proveedor;
+import cava.model.entity.TipoMovimientoMaterial;
 import cava.model.repository.CategoriaRepository;
 import cava.model.repository.CavaPartidaRepository;
 import cava.model.repository.CavaRepository;
+import cava.model.repository.CompraMaterialRepository;
 import cava.model.repository.DeguelleRepository;
 import cava.model.repository.FamiliaRepository;
 import cava.model.repository.MaterialCavaRepository;
 import cava.model.repository.MaterialRepository;
 import cava.model.repository.MovimientoMaterialRepository;
 import cava.model.repository.PartidaRepository;
+import cava.model.repository.ProveedorRepository;
 import cava.model.repository.VentaRepository;
 import jakarta.transaction.Transactional;
 
@@ -60,23 +66,58 @@ public class ResetService {
     
     @Autowired
     private VentaRepository vRepo;
+    
+    @Autowired
+    private ProveedorRepository prepo;
+    
+    @Autowired
+    private CompraMaterialRepository cmRepo;
 
     @Transactional
     public void reiniciarBaseDeDatos() {
-        // Borrar en el orden correcto por dependencias
-    	vRepo.deleteAll();
-        mcRepo.deleteAll(); 
-        mmRepo.deleteAll(); 
-        matRepo.deleteAll();
+        // 1. Ventas (no dependen de nadie, pero sí de CavaPartida)
+        vRepo.deleteAll();
+
+        // 2. Movimientos (referencian Material y CompraMaterial)
+        mmRepo.deleteAll();
+
+        // 3. Relación material-cava (intermedia)
+        mcRepo.deleteAll();
+
+        // 4. Compras (referencian Material y Proveedor)
+        cmRepo.deleteAll();
+
+        // 5. Degüelles (referenciados en MovimientoMaterial)
         dRepo.deleteAll();
+
+        // 6. Relación cava-partida
         cavaPartidaRepo.deleteAll();
-        cavaRepo.deleteAll();
+
+        // 7. Partidas
         partidaRepo.deleteAll();
-        fRepo.deleteAll();
+
+        // 8. Cavas (dependen de Familia)
+        cavaRepo.deleteAll();
+
+        // 9. Materiales (dependen de Categoría y Familia)
+        matRepo.deleteAll();
+
+        // 10. Proveedores
+        prepo.deleteAll();
+
+        // 11. Categorías
         catRepo.deleteAll();
+
+        // 12. Familias
+        fRepo.deleteAll();
         
         
-        // Insertar partidas de ejemplo
+        Familia f1 = new Familia(1L, "Montsant");
+        Familia f2 = new Familia(2L, "Mas Xarot");
+        Familia f3 = new Familia(3L, "Roca Gibert");
+
+        fRepo.saveAll(List.of(f1, f2, f3));
+        
         Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", " 25% Parellada", null);
         Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null);
         Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null);
@@ -84,14 +125,9 @@ public class ResetService {
 
         partidaRepo.saveAll(List.of(p1, p2, p3, p4));
         
-     // Insertar familias
-        Familia f1 = new Familia(1L, "Montsant");
-        Familia f2 = new Familia(2L, "Mas Xarot");
-        Familia f3 = new Familia(3L, "Roca Gibert");
 
-        fRepo.saveAll(List.of(f1, f2, f3));
         
-     // Insertar cavas
+
         Cava cava1 = new Cava("21", "Mas Xarot Brut", true, f2, null);
         Cava cava2 = new Cava("24", "Mas Xarot Brut Nature", true, f2, null);
         Cava cava3 = new Cava("25", "Mas Xarot Enoteca", false, f2, null);
@@ -100,10 +136,9 @@ public class ResetService {
         cavaRepo.saveAll(List.of(cava1, cava2, cava3, cava4));
         
         
-     // Recuperar cavas y partidas existentes
-     // Crear relaciones usando las cavas y partidas recién creadas
+
         CavaPartida r2 = new CavaPartida(null, cava1, p2, 0, 0, false, LocalDateTime.now());
-        CavaPartida r3 = new CavaPartida(null, cava1, p3, 0, 0, true, LocalDateTime.now()); // actual
+        CavaPartida r3 = new CavaPartida(null, cava1, p3, 0, 0, true, LocalDateTime.now());
         CavaPartida r4 = new CavaPartida(null, cava2, p2, 0, 0, true, LocalDateTime.now());
         CavaPartida r6 = new CavaPartida(null, cava3, p1, 0, 0, true, LocalDateTime.now());
         CavaPartida r7 = new CavaPartida(null, cava4, p4, 0, 0, true, LocalDateTime.now());
@@ -114,42 +149,45 @@ public class ResetService {
         Categoria c3 = new Categoria(null, "Cajas");
         catRepo.saveAll(List.of(c1, c2, c3));
         
-        Material m1 = new Material(null, "Cápsula Mas Xarot", c1, f2, null, 10000, 1f);
+        
+        Proveedor enoplastic = new Proveedor(null, "Enoplastic");
+        Proveedor vidal = new Proveedor(null, "Vidal & Armadans");
+        Proveedor cartonajes = new Proveedor(null, "Cartonajes Font");
+        prepo.saveAll(List.of(enoplastic, vidal, cartonajes));
+        
+        
+        Material m1 = new Material(null, "Cápsula Mas Xarot", c1, f2, null, 30000, 1f);
         Material m2 = new Material(null, "Etiqueta Mas Xarot", c2, f2, null, 10000, 1f);
         Material m3 = new Material(null, "Caja Mas Xarot", c3, f2, null, 1000, 0.17f);
         Material m4 = new Material(null, "Caja Montsant", c3, f1, null, 1000, 0.17f);
-
-
         matRepo.saveAll(List.of(m1, m2, m3, m4));
-        
-     // Mas Xarot Brut
-        MaterialCava mc1 = new MaterialCava(null, cava1, m1);        // 1 cápsula por botella
-        MaterialCava mc2 = new MaterialCava(null, cava1, m2);        // 1 etiqueta por botella
-        MaterialCava mc3 = new MaterialCava(null, cava1, m3);   // 1 caja cada 6 botellas
 
-        // Mas Xarot Brut Nature
+        CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0, "Albarán 1", enoplastic, LocalDate.now(), m1);
+        CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0, "Albarán 2", vidal, LocalDate.now(), m2);
+        CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0, "Albarán 3", cartonajes, LocalDate.now(), m3);
+        CompraMaterial compra4 = new CompraMaterial(null, 10000, 1520.0, "Albarán 4", vidal, LocalDate.now(), m4);
+        cmRepo.saveAll(List.of(compra1, compra2, compra3, compra4));
+        
+        MovimientoMaterial mm1 = new MovimientoMaterial(null, LocalDate.now(), TipoMovimientoMaterial.ENTRADA, "Albarán 1", 30000, m1, null, 30000, compra1);
+        MovimientoMaterial mm2 = new MovimientoMaterial(null, LocalDate.now(), TipoMovimientoMaterial.ENTRADA, "Albarán 2", 10000, m2, null, 10000, compra2);
+        MovimientoMaterial mm3 = new MovimientoMaterial(null, LocalDate.now(), TipoMovimientoMaterial.ENTRADA, "Albarán 3", 1000, m3, null, 1000, compra3);
+        MovimientoMaterial mm4 = new MovimientoMaterial(null, LocalDate.now(), TipoMovimientoMaterial.ENTRADA, "Albarán 4", 1000, m4, null, 1000, compra4);
+        mmRepo.saveAll(List.of(mm1, mm2, mm3, mm4));
+
+
+        
+        MaterialCava mc1 = new MaterialCava(null, cava1, m1);
+        MaterialCava mc2 = new MaterialCava(null, cava1, m2);
+        MaterialCava mc3 = new MaterialCava(null, cava1, m3);
         MaterialCava mc4 = new MaterialCava(null, cava2, m1);
         MaterialCava mc5 = new MaterialCava(null, cava2, m2);
         MaterialCava mc6 = new MaterialCava(null, cava2, m3);
-
-        // Mas Xarot Enoteca
         MaterialCava mc7 = new MaterialCava(null, cava3, m1);
         MaterialCava mc8 = new MaterialCava(null, cava3, m2);
         MaterialCava mc9 = new MaterialCava(null, cava3, m3);
-
-        // Montsant Artesà
         MaterialCava mc10 = new MaterialCava(null, cava4, m4);
 
         mcRepo.saveAll(List.of(mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10));
-//        // Insertar datos de ejemplo
-//        Partida p1 = new Partida("18pin", LocalDate.now());
-//        Partida p2 = new Partida("20pin", LocalDate.now());
-//        partidaRepo.saveAll(List.of(p1, p2));
-//
-//        Cava cava1 = new Cava("Mas Xarot Brut", true, 0);
-//        cavaRepo.save(cava1);
-//
-//        CavaPartida cp1 = new CavaPartida(cava1, p1, 100, true);
-//        cavaPartidaRepo.save(cp1);
+
     }
 }

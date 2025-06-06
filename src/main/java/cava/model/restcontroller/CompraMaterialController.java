@@ -10,8 +10,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import cava.model.dto.CompraMaterialDto;
+import cava.model.dto.MovimientoMaterialDto;
 import cava.model.entity.CompraMaterial;
+import cava.model.entity.Material;
+import cava.model.entity.MovimientoMaterial;
+import cava.model.entity.Proveedor;
+import cava.model.entity.TipoMovimientoMaterial;
 import cava.model.service.CompraMaterialService;
+import cava.model.service.MaterialService;
+import cava.model.service.MovimientoMaterialService;
+import cava.model.service.ProveedorService;
 
 @RestController
 @RequestMapping("/api/compra-material")
@@ -20,6 +28,15 @@ public class CompraMaterialController {
 
     @Autowired
     private CompraMaterialService cmservice;
+    
+    @Autowired
+    private ProveedorService pservice;
+    
+    @Autowired
+    private MaterialService mservice;
+    
+    @Autowired
+    private MovimientoMaterialService mmservice;
 
     @Autowired
     private ModelMapper mapper;
@@ -69,8 +86,23 @@ public class CompraMaterialController {
             return ResponseEntity.ok(dto);
         }
     }
+    
+    
+    // Obtener un movimiento
+    @GetMapping("/articulo/{id}")
+    public ResponseEntity<?> obtenerMovimientosDeUnArticulo(@PathVariable Long id) {
+        List<CompraMaterial> movimientos = cmservice.findByMaterialId(id);
 
-    // Insertar nueva compra
+        List<CompraMaterialDto> dtos = new ArrayList<>();
+        for (CompraMaterial m : movimientos) {
+        	CompraMaterialDto dto = mapper.map(m, CompraMaterialDto.class);
+            dtos.add(dto);
+        }
+
+        return ResponseEntity.ok(dtos);
+    }
+
+ // Insertar nueva compra
     @PostMapping("/insertar")
     public ResponseEntity<?> insertarUno(@RequestBody CompraMaterialDto dto) {
         if (dto.getId() != null && cmservice.buscar(dto.getId()) != null) {
@@ -78,20 +110,86 @@ public class CompraMaterialController {
                     .body("Ya existe una compra con el ID " + dto.getId());
         }
 
-        CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
-        CompraMaterial nueva = cmservice.insertar(compra);
-        CompraMaterialDto respuesta = mapper.map(nueva, CompraMaterialDto.class);
-        return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
-    }
+        if (dto.getProveedorId() == null) {
+            return ResponseEntity.badRequest().body("Debe especificarse el ID del proveedor");
+        }
 
-    // Modificar compra existente
-    @PutMapping("/modificar/{id}")
-    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody CompraMaterialDto dto) {
-        if (!id.equals(dto.getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El ID en la URL y en el cuerpo no coinciden");
+        if (dto.getMaterialId() == null) {
+            return ResponseEntity.badRequest().body("Debe especificarse el ID del material");
+        }
+
+        Proveedor proveedor = pservice.buscar(dto.getProveedorId());
+        if (proveedor == null) {
+            return ResponseEntity.badRequest().body("Proveedor no encontrado con ID: " + dto.getProveedorId());
+        }
+
+        Material material = mservice.buscar(dto.getMaterialId());
+        if (material == null) {
+            return ResponseEntity.badRequest().body("Material no encontrado con ID: " + dto.getMaterialId());
         }
 
         CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
+        compra.setProveedor(proveedor);
+        compra.setMaterial(material);
+
+        CompraMaterial nueva = cmservice.insertar(compra);
+        
+        MovimientoMaterial movimiento = new MovimientoMaterial();
+        movimiento.setCantidad(compra.getCantidad());
+        movimiento.setDescripcion(compra.getDescripcion());
+        movimiento.setFecha(compra.getFecha());
+        movimiento.setMaterial(compra.getMaterial());
+        movimiento.setTipo(TipoMovimientoMaterial.ENTRADA);
+        movimiento.setStockResultante(material.getCantidad() + compra.getCantidad());
+        movimiento.setCompraMaterial(compra);
+        mmservice.insertar(movimiento);
+        
+        // Actualizar stock del material
+        material.setCantidad(material.getCantidad() + compra.getCantidad());
+        mservice.modificar(material);
+        
+        
+        CompraMaterialDto respuesta = mapper.map(nueva, CompraMaterialDto.class);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    }
+
+ // Modificar compra existente
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody CompraMaterialDto dto) {
+        if (!id.equals(dto.getId())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("El ID en la URL y en el cuerpo no coinciden");
+        }
+
+        // Validar existencia de la compra
+        if (cmservice.buscar(id) == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("No se encontró ninguna compra con ID: " + id);
+        }
+
+        if (dto.getProveedorId() == null) {
+            return ResponseEntity.badRequest().body("Debe especificarse el ID del proveedor");
+        }
+
+        if (dto.getMaterialId() == null) {
+            return ResponseEntity.badRequest().body("Debe especificarse el ID del material");
+        }
+
+        Proveedor proveedor = pservice.buscar(dto.getProveedorId());
+        if (proveedor == null) {
+            return ResponseEntity.badRequest().body("Proveedor no encontrado con ID: " + dto.getProveedorId());
+        }
+
+        Material material = mservice.buscar(dto.getMaterialId());
+        if (material == null) {
+            return ResponseEntity.badRequest().body("Material no encontrado con ID: " + dto.getMaterialId());
+        }
+
+        CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
+        compra.setProveedor(proveedor);
+        compra.setMaterial(material);
+
         CompraMaterial actualizada = cmservice.modificar(compra);
         CompraMaterialDto respuesta = mapper.map(actualizada, CompraMaterialDto.class);
         return ResponseEntity.ok(respuesta);

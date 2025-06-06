@@ -40,4 +40,7 @@ public class MovimientoMaterial {
 	
     private int stockResultante;
 
+    @ManyToOne
+    @JoinColumn(name = "compra_material_id", nullable = true)
+    private CompraMaterial compraMaterial;
 }
