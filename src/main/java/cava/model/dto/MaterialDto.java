@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class MaterialDto {
     private Long id;
     private String nombre;
+    private float precioActual;
     private Long categoriaId;
     private String categoriaNombre;
     private Long familiaId;

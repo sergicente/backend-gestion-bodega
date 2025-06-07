@@ -11,6 +11,7 @@ public class MaterialCavaDto {
     private int id; 
     private Long materialId;
     private String materialNombre;
+    private float materialPrecioActual;
     private int cantidad;
     private String categoriaNombre;
     private int cantidadGastada;

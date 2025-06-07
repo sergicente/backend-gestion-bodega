@@ -24,6 +24,8 @@ public class Material {
     private Long id;
 
     private String nombre;
+    
+    private float precioActual;
 
     @ManyToOne
     @JoinColumn(name = "categoria_id")

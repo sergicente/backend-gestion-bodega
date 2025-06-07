@@ -127,6 +127,10 @@ public class CompraMaterialController {
         if (material == null) {
             return ResponseEntity.badRequest().body("Material no encontrado con ID: " + dto.getMaterialId());
         }
+        
+        if (dto.getPrecioUnitario() <= 0) {
+            return ResponseEntity.badRequest().body("El precio unitario debe ser mayor que 0");
+        }
 
         CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
         compra.setProveedor(proveedor);
@@ -146,6 +150,7 @@ public class CompraMaterialController {
         
         // Actualizar stock del material
         material.setCantidad(material.getCantidad() + compra.getCantidad());
+        material.setPrecioActual((float) dto.getPrecioUnitario());
         mservice.modificar(material);
         
         
