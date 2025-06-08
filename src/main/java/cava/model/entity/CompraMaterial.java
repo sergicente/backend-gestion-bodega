@@ -25,6 +25,8 @@ public class CompraMaterial {
     private int cantidad;
 
     private double precioTotal;
+    
+    private double precioUnitario;
 
     private String descripcion;
     

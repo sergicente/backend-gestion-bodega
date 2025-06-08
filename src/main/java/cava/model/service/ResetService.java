@@ -162,10 +162,10 @@ public class ResetService {
         Material m4 = new Material(null, "Caja Montsant", (float)(810.0 / 1000), c3, f1, null, 1000, 0.17f);
         matRepo.saveAll(List.of(m1, m2, m3, m4));
 
-        CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0, "Albarán 1", enoplastic, LocalDate.of(2023, 3, 5), m1);
-        CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0, "Albarán 2", vidal, LocalDate.of(2024, 5, 11), m2);
-        CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0, "Albarán 3", cartonajes, LocalDate.of(2025, 4, 3), m3);
-        CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0, "Albarán 4", vidal, LocalDate.of(2015, 7, 6), m4);
+        CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0,0.05, "Albarán 1", enoplastic, LocalDate.of(2023, 3, 5), m1);
+        CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0,0.15, "Albarán 2", vidal, LocalDate.of(2024, 5, 11), m2);
+        CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0,0.83, "Albarán 3", cartonajes, LocalDate.of(2025, 4, 3), m3);
+        CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0,0.81, "Albarán 4", vidal, LocalDate.of(2015, 7, 6), m4);
         cmRepo.saveAll(List.of(compra1, compra2, compra3, compra4));
         
         MovimientoMaterial mm1 = new MovimientoMaterial(null, LocalDate.of(2023, 3, 5), TipoMovimientoMaterial.ENTRADA, "Albarán 1", 30000, m1, null, 30000, compra1);

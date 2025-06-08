@@ -20,6 +20,7 @@ import cava.model.service.CompraMaterialService;
 import cava.model.service.MaterialService;
 import cava.model.service.MovimientoMaterialService;
 import cava.model.service.ProveedorService;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/compra-material")
@@ -103,6 +104,7 @@ public class CompraMaterialController {
     }
 
  // Insertar nueva compra
+	@Transactional
     @PostMapping("/insertar")
     public ResponseEntity<?> insertarUno(@RequestBody CompraMaterialDto dto) {
         if (dto.getId() != null && cmservice.buscar(dto.getId()) != null) {
@@ -135,6 +137,7 @@ public class CompraMaterialController {
         CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
         compra.setProveedor(proveedor);
         compra.setMaterial(material);
+        compra.setPrecioUnitario(dto.getPrecioTotal() / dto.getCantidad());
 
         CompraMaterial nueva = cmservice.insertar(compra);
         
@@ -159,55 +162,115 @@ public class CompraMaterialController {
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
     }
 
- // Modificar compra existente
-    @PutMapping("/modificar/{id}")
-    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody CompraMaterialDto dto) {
-        if (!id.equals(dto.getId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("El ID en la URL y en el cuerpo no coinciden");
-        }
+	@PutMapping("/modificar/{id}")
+	@Transactional
+	public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody CompraMaterialDto dto) {
+	    if (!id.equals(dto.getId())) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("El ID en la URL y en el cuerpo no coinciden");
+	    }
 
-        // Validar existencia de la compra
-        if (cmservice.buscar(id) == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("No se encontró ninguna compra con ID: " + id);
-        }
+	    CompraMaterial existente = cmservice.buscar(id);
+	    if (existente == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body("No se encontró ninguna compra con ID: " + id);
+	    }
 
-        if (dto.getProveedorId() == null) {
-            return ResponseEntity.badRequest().body("Debe especificarse el ID del proveedor");
-        }
+	    if (dto.getProveedorId() == null || dto.getMaterialId() == null) {
+	        return ResponseEntity.badRequest().body("Proveedor y material son obligatorios");
+	    }
 
-        if (dto.getMaterialId() == null) {
-            return ResponseEntity.badRequest().body("Debe especificarse el ID del material");
-        }
+	    Proveedor proveedor = pservice.buscar(dto.getProveedorId());
+	    if (proveedor == null) {
+	        return ResponseEntity.badRequest().body("Proveedor no encontrado con ID: " + dto.getProveedorId());
+	    }
 
-        Proveedor proveedor = pservice.buscar(dto.getProveedorId());
-        if (proveedor == null) {
-            return ResponseEntity.badRequest().body("Proveedor no encontrado con ID: " + dto.getProveedorId());
-        }
+	    Material material = mservice.buscar(dto.getMaterialId());
+	    if (material == null) {
+	        return ResponseEntity.badRequest().body("Material no encontrado con ID: " + dto.getMaterialId());
+	    }
 
-        Material material = mservice.buscar(dto.getMaterialId());
-        if (material == null) {
-            return ResponseEntity.badRequest().body("Material no encontrado con ID: " + dto.getMaterialId());
-        }
+	    // 1. Ajustar stock (diferencia entre cantidades)
+	    int cantidadOriginal = existente.getCantidad();
+	    int nuevaCantidad = dto.getCantidad();
+	    int diferencia = nuevaCantidad - cantidadOriginal;
 
-        CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
-        compra.setProveedor(proveedor);
-        compra.setMaterial(material);
+	    if (material.getCantidad() + diferencia < 0) {
+	        return ResponseEntity.status(HttpStatus.CONFLICT)
+	                .body("No se puede modificar la compra porque se ha consumido parte del material.");
+	    }
 
-        CompraMaterial actualizada = cmservice.modificar(compra);
-        CompraMaterialDto respuesta = mapper.map(actualizada, CompraMaterialDto.class);
-        return ResponseEntity.ok(respuesta);
-    }
+	    material.setCantidad(material.getCantidad() + diferencia);
+	    float nuevoPrecioUnitario = (float) dto.getPrecioTotal() / dto.getCantidad();
+	    material.setPrecioActual(nuevoPrecioUnitario);
+	    mservice.modificar(material);
 
-    // Borrar compra
+	    // 2. Modificar compra
+	    CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
+	    compra.setProveedor(proveedor);
+	    compra.setMaterial(material);
+	    compra.setPrecioUnitario(nuevoPrecioUnitario);
+	    CompraMaterial actualizada = cmservice.modificar(compra);
+
+	    // 3. Modificar movimiento asociado
+	    MovimientoMaterial movimiento = mmservice.findByCompraMaterialId(id);
+	    movimiento.setCantidad(nuevaCantidad);
+	    movimiento.setDescripcion(dto.getDescripcion());
+	    movimiento.setFecha(dto.getFecha());
+	    movimiento.setMaterial(material);
+	    movimiento.setTipo(TipoMovimientoMaterial.ENTRADA);
+	    movimiento.setStockResultante(material.getCantidad());
+	    movimiento.setCompraMaterial(actualizada);
+	    mmservice.modificar(movimiento);
+
+	    CompraMaterialDto respuesta = mapper.map(actualizada, CompraMaterialDto.class);
+	    return ResponseEntity.ok(respuesta);
+	}
+
+    @Transactional
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
         CompraMaterial existente = cmservice.buscar(id);
         if (existente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la compra");
         }
+        
+        Material material = existente.getMaterial();
+        MovimientoMaterial movimiento = mmservice.findByCompraMaterialId(id);
+
+        int cantidadCompra = existente.getCantidad();
+        int stockActual = material.getCantidad();
+
+        if (stockActual < cantidadCompra) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("No se puede borrar la compra porque ya se ha consumido parte del material.");
+        }
+        
+
+     
+
+        // Restar cantidad
+        material.setCantidad(stockActual - cantidadCompra);
+        mservice.modificar(material); // Asegúrate de guardar el cambio en el stock
+
+        // Borrar movimiento y compra
+        mmservice.borrar(movimiento.getId());
         cmservice.borrar(id);
+        
+     // Después de borrar la compra:
+        List<CompraMaterial> compras = cmservice.findByMaterialIdOrderByFechaDesc(material.getId());
+
+        if (!compras.isEmpty()) {
+            double nuevoPrecio = compras.get(0).getPrecioUnitario();
+            material.setPrecioActual((float)nuevoPrecio);
+        } else {
+            // No hay compras → precio a 0 o nulo
+            material.setPrecioActual(0);
+        }
+
+        mservice.modificar(material);
+        
+
         return ResponseEntity.noContent().build();
     }
 }

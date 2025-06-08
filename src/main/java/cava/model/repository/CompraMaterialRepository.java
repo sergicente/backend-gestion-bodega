@@ -11,6 +11,6 @@ import cava.model.entity.MovimientoMaterial;
 
 public interface CompraMaterialRepository extends JpaRepository<CompraMaterial, Long>{
 	List<CompraMaterial> findByMaterialId(Long id);
-
+	List<CompraMaterial> findByMaterialIdOrderByFechaDesc(Long materialId);
 
 }
