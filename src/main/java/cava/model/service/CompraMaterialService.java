@@ -9,4 +9,5 @@ import cava.model.entity.Venta;
 public interface CompraMaterialService extends InterfaceGenericoCrud<CompraMaterial, Long>{
 	List<CompraMaterial> findByMaterialId(Long id);
 	List<CompraMaterial> findByMaterialIdOrderByFechaDesc(Long materialId);
+	List<CompraMaterial> findByProveedorId(Long id);
 }

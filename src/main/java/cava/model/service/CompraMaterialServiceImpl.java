@@ -61,8 +61,12 @@ public class CompraMaterialServiceImpl implements CompraMaterialService{
 
 	@Override
 	public List<CompraMaterial> findByMaterialIdOrderByFechaDesc(Long materialId) {
-		// TODO Auto-generated method stub
 		return cmrepo.findByMaterialIdOrderByFechaDesc(materialId);
+	}
+
+	@Override
+	public List<CompraMaterial> findByProveedorId(Long id) {
+		return cmrepo.findByProveedorId(id);
 	}
 
 }

@@ -88,6 +88,20 @@ public class CompraMaterialController {
         }
     }
     
+ // Obtener todas las compras de un proveedor
+    @GetMapping("proveedor/{id}")
+    public ResponseEntity<?> obtenerComprasPorProveedor(@PathVariable Long id) {
+        List<CompraMaterial> compras = cmservice.findByProveedorId(id);
+
+        List<CompraMaterialDto> dto = new ArrayList<>();
+        for (CompraMaterial compra : compras) {
+            CompraMaterialDto d = mapper.map(compra, CompraMaterialDto.class);
+            dto.add(d);
+        }
+
+        return ResponseEntity.ok(dto);
+    }
+    
     
     // Obtener un movimiento
     @GetMapping("/articulo/{id}")
