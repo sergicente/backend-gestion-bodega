@@ -17,4 +17,5 @@ public class CavaDto {
     private boolean ecologico;
     private PartidaDto partidaActual;
     private List<CavaPartidaDto> partidasRelacionadas;
+    private List<MaterialCavaDto> materialesRelacionados;
 }

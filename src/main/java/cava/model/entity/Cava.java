@@ -32,5 +32,8 @@ public class Cava {
 
     @OneToMany(mappedBy = "cava", cascade = CascadeType.ALL)
     private List<CavaPartida> partidasRelacionadas;
+    
+    @OneToMany(mappedBy = "cava", cascade = CascadeType.ALL)
+    private List<MaterialCava> materialesRelacionados;
 
 }
