@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -85,10 +86,34 @@ public class MovimientoMaterialController {
     
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
-    	MovimientoMaterial existente = mservice.buscar(id);
+        MovimientoMaterial existente = mservice.buscar(id);
         if (existente == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el movimiento con ID " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("No se encuentra el movimiento con ID " + id);
         }
+
+        Material material = existente.getMaterial();
+        int stockActual = material.getCantidad();
+        int nuevoStock;
+
+        // Calcular el stock revertido según el tipo de movimiento
+        switch (existente.getTipo()) {
+            case ENTRADA -> nuevoStock = stockActual - existente.getCantidad();
+            case SALIDA -> nuevoStock = stockActual + existente.getCantidad();
+            default -> {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Tipo de movimiento inválido");
+            }
+        }
+
+        if (nuevoStock < 0) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("No se puede borrar el movimiento porque el stock actual es inferior al requerido.");
+        }
+
+        material.setCantidad(nuevoStock);
+        matservice.modificar(material);
+
         mservice.borrar(id);
         return ResponseEntity.noContent().build();
     }
@@ -138,5 +163,60 @@ public class MovimientoMaterialController {
         MovimientoMaterialDto nuevoDto = mapper.map(movimiento, MovimientoMaterialDto.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
+    }
+    
+    
+    @Transactional
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody MovimientoMaterialDto dto) {
+//        if (!id.equals(dto.getId())) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+//                .body("El ID en la URL y en el cuerpo no coinciden");
+//        }
+
+        MovimientoMaterial existente = mservice.buscar(id);
+        if (existente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("No se encuentra el movimiento con ID " + id);
+        }
+
+        Material material = matservice.buscar(dto.getMaterialId());
+        if (material == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("No se encuentra el material con ID " + dto.getMaterialId());
+        }
+
+
+        //️ Revertir stock anterior
+        int stockAntesDelMovimiento = switch (existente.getTipo()) {
+            case ENTRADA -> existente.getStockResultante() - existente.getCantidad();
+            case SALIDA -> existente.getStockResultante() + existente.getCantidad();
+            default -> throw new IllegalStateException("Tipo de movimiento inválido");
+        };
+
+        // Calcular nuevo stock resultante
+        int nuevoStock = switch (dto.getTipo()) {
+            case ENTRADA -> stockAntesDelMovimiento + dto.getCantidad();
+            case SALIDA -> stockAntesDelMovimiento - dto.getCantidad();
+            default -> throw new IllegalStateException("Tipo de movimiento inválido");
+        };
+
+        if (nuevoStock < 0) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body("No hay suficiente stock para realizar esta modificación.");
+        }
+
+        //️ Aplicar cambios
+        material.setCantidad(nuevoStock);
+        matservice.modificar(material);
+
+        MovimientoMaterial movimiento = mapper.map(dto, MovimientoMaterial.class);
+        movimiento.setMaterial(material);
+        movimiento.setStockResultante(nuevoStock);
+
+        mservice.modificar(movimiento);
+
+        MovimientoMaterialDto actualizado = mapper.map(movimiento, MovimientoMaterialDto.class);
+        return ResponseEntity.ok(actualizado);
     }
 }
