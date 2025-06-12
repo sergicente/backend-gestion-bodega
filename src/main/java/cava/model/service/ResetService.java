@@ -167,18 +167,18 @@ public class ResetService {
         CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0,0.05, "Albarán 1", enoplastic, LocalDate.of(2023, 3, 5), m1);
         CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0,0.15, "Albarán 2", vidal, LocalDate.of(2024, 5, 11), m2);
         CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0,0.83, "Albarán 3", cartonajes, LocalDate.of(2025, 4, 3), m3);
-        CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0,0.81, "Albarán 4", cartonajes, LocalDate.of(2015, 7, 6), m4);
+        CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0,0.81, "Albarán 4", cartonajes, LocalDate.of(2025, 7, 6), m4);
         CompraMaterial compra5 = new CompraMaterial(null, 10000, 1050.0,0.105, "Albarán 5", vidal, LocalDate.of(2024, 5, 11), m5);
-        CompraMaterial compra6 = new CompraMaterial(null, 10000, 750.0,0.075, "Albarán 5", vidal, LocalDate.of(2024, 5, 11), m6);
+        CompraMaterial compra6 = new CompraMaterial(null, 10000, 750.0,0.075, "Albarán 6", vidal, LocalDate.of(2024, 5, 11), m6);
         cmRepo.saveAll(List.of(compra1, compra2, compra3, compra4, compra5, compra6));
         
         
         MovimientoMaterial mm1 = new MovimientoMaterial(null, LocalDate.of(2023, 3, 5), TipoMovimientoMaterial.ENTRADA, "Albarán 1", 30000, m1, null, 30000, compra1);
         MovimientoMaterial mm2 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 2", 10000, m2, null, 10000, compra2);
         MovimientoMaterial mm3 = new MovimientoMaterial(null, LocalDate.of(2025, 4, 3), TipoMovimientoMaterial.ENTRADA, "Albarán 3", 1000, m3, null, 1000, compra3);
-        MovimientoMaterial mm4 = new MovimientoMaterial(null, LocalDate.of(2015, 7, 6), TipoMovimientoMaterial.ENTRADA, "Albarán 4", 1000, m4, null, 1000, compra4);
+        MovimientoMaterial mm4 = new MovimientoMaterial(null, LocalDate.of(2025, 7, 6), TipoMovimientoMaterial.ENTRADA, "Albarán 4", 1000, m4, null, 1000, compra4);
         MovimientoMaterial mm5 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 5", 10000, m5, null, 10000, compra5);
-        MovimientoMaterial mm6 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 5", 10000, m6, null, 10000, compra6);
+        MovimientoMaterial mm6 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 6", 10000, m6, null, 10000, compra6);
 
         mmRepo.saveAll(List.of(mm1, mm2, mm3, mm4, mm5, mm6));
 

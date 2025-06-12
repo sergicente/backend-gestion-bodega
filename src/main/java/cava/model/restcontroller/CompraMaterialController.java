@@ -20,6 +20,7 @@ import cava.model.service.CompraMaterialService;
 import cava.model.service.MaterialService;
 import cava.model.service.MovimientoMaterialService;
 import cava.model.service.ProveedorService;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -41,6 +42,9 @@ public class CompraMaterialController {
 
     @Autowired
     private ModelMapper mapper;
+    
+    @Autowired
+    private EntityManager entityManager;
 
     // Obtener todas las compras
     @GetMapping
@@ -167,7 +171,9 @@ public class CompraMaterialController {
         
         // Actualizar stock del material
         material.setCantidad(material.getCantidad() + compra.getCantidad());
-        material.setPrecioActual((float) dto.getPrecioUnitario());
+//        material.setPrecioActual((float) dto.getPrecioUnitario());
+        Float nuevoPrecio = calcularNuevoPrecio(material);
+        material.setPrecioActual(nuevoPrecio);
         mservice.modificar(material);
         
         
@@ -199,41 +205,50 @@ public class CompraMaterialController {
 	        return ResponseEntity.badRequest().body("Proveedor no encontrado con ID: " + dto.getProveedorId());
 	    }
 
-	    Material material = mservice.buscar(dto.getMaterialId());
-	    if (material == null) {
-	        return ResponseEntity.badRequest().body("Material no encontrado con ID: " + dto.getMaterialId());
-	    }
+	    Material materialAnterior = existente.getMaterial();
+	    Material materialNuevo = mservice.buscar(dto.getMaterialId());
 
-	    // 1. Ajustar stock (diferencia entre cantidades)
 	    int cantidadOriginal = existente.getCantidad();
 	    int nuevaCantidad = dto.getCantidad();
-	    int diferencia = nuevaCantidad - cantidadOriginal;
 
-	    if (material.getCantidad() + diferencia < 0) {
+	    //  Verifica que el material anterior tiene stock suficiente para revertir la compra original
+	    if (!materialAnterior.getId().equals(materialNuevo.getId()) && materialAnterior.getCantidad() < cantidadOriginal) {
 	        return ResponseEntity.status(HttpStatus.CONFLICT)
-	                .body("No se puede modificar la compra porque se ha consumido parte del material.");
+	                .body("No se puede cambiar de material porque parte del material original ya fue consumido.");
 	    }
 
-	    material.setCantidad(material.getCantidad() + diferencia);
-	    float nuevoPrecioUnitario = (float) dto.getPrecioTotal() / dto.getCantidad();
-	    material.setPrecioActual(nuevoPrecioUnitario);
-	    mservice.modificar(material);
+	    // 1. Revertir stock del material anterior
+	    materialAnterior.setCantidad(materialAnterior.getCantidad() - cantidadOriginal);
+	    
 
-	    // 2. Modificar compra
+	    // 2. Añadir al stock del nuevo material
+	    materialNuevo.setCantidad(materialNuevo.getCantidad() + nuevaCantidad);
+	    float nuevoPrecioUnitario = (float) dto.getPrecioTotal() / dto.getCantidad();
+	    
+	    
+
+	    // 3. Modificar compra
 	    CompraMaterial compra = mapper.map(dto, CompraMaterial.class);
 	    compra.setProveedor(proveedor);
-	    compra.setMaterial(material);
+	    compra.setMaterial(materialNuevo);
 	    compra.setPrecioUnitario(nuevoPrecioUnitario);
 	    CompraMaterial actualizada = cmservice.modificar(compra);
+	    
+	    Float nuevoPrecioAnterior = calcularNuevoPrecio(materialAnterior);
+        Float nuevoPrecio = calcularNuevoPrecio(materialNuevo);
+        materialAnterior.setPrecioActual(nuevoPrecioAnterior);
+        materialNuevo.setPrecioActual(nuevoPrecio);
+	    mservice.modificar(materialAnterior);
+	    mservice.modificar(materialNuevo);
 
-	    // 3. Modificar movimiento asociado
+	    // 4. Modificar movimiento
 	    MovimientoMaterial movimiento = mmservice.findByCompraMaterialId(id);
 	    movimiento.setCantidad(nuevaCantidad);
 	    movimiento.setDescripcion(dto.getDescripcion());
 	    movimiento.setFecha(dto.getFecha());
-	    movimiento.setMaterial(material);
+	    movimiento.setMaterial(materialNuevo);
 	    movimiento.setTipo(TipoMovimientoMaterial.ENTRADA);
-	    movimiento.setStockResultante(material.getCantidad());
+	    movimiento.setStockResultante(materialNuevo.getCantidad());
 	    movimiento.setCompraMaterial(actualizada);
 	    mmservice.modificar(movimiento);
 
@@ -261,30 +276,25 @@ public class CompraMaterialController {
         }
         
 
-     
-
-        // Restar cantidad
-        material.setCantidad(stockActual - cantidadCompra);
-        mservice.modificar(material); // Asegúrate de guardar el cambio en el stock
 
         // Borrar movimiento y compra
         mmservice.borrar(movimiento.getId());
+        
+        // Después borrar la compra:
         cmservice.borrar(id);
         
-     // Después de borrar la compra:
-        List<CompraMaterial> compras = cmservice.findByMaterialIdOrderByFechaDesc(material.getId());
-
-        if (!compras.isEmpty()) {
-            double nuevoPrecio = compras.get(0).getPrecioUnitario();
-            material.setPrecioActual((float)nuevoPrecio);
-        } else {
-            // No hay compras → precio a 0 o nulo
-            material.setPrecioActual(0);
-        }
-
+        // Restar cantidad
+        material.setCantidad(stockActual - cantidadCompra);
+        material.setPrecioActual(calcularNuevoPrecio(material));
         mservice.modificar(material);
         
 
         return ResponseEntity.noContent().build();
     }
+    
+    private Float calcularNuevoPrecio(Material material) {
+        List<CompraMaterial> compras = cmservice.findByMaterialIdOrderByFechaDesc(material.getId());
+        return compras.isEmpty() ? 0f : (float) compras.get(0).getPrecioUnitario();
+    }
+    
 }
