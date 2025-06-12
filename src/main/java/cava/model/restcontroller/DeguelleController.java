@@ -116,9 +116,9 @@ public class DeguelleController {
 	        int cantidadARestar = Math.round(mat.getMaterial().getCantidadGastada() * dto.getCantidad());
 	        int nuevoStock = material.getCantidad() - cantidadARestar;
 
-	        if (nuevoStock < 0) {
-	            throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
-	        }
+//	        if (nuevoStock < 0) {
+//	            throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
+//	        }
 
 	        material.setCantidad(nuevoStock);
 	        matservice.insertar(material);
