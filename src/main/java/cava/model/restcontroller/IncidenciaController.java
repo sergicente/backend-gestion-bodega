@@ -34,6 +34,7 @@ import cava.model.service.IncidenciaService;
 import cava.model.service.PartidaService;
 import cava.model.service.ProveedorService;
 import cava.model.service.VentaService;
+import jakarta.transaction.Transactional;
 
 
 @RestController
@@ -81,63 +82,66 @@ public class IncidenciaController {
 
 	
 	@PostMapping("/insertar")
+	@Transactional
 	public ResponseEntity<?> insertarUno(@RequestBody IncidenciaDto dto) {
-	    // Buscar la partida asociada
+	    // Buscar la partida
 	    Partida partida = pservice.buscar(dto.getPartidaId());
 	    if (partida == null) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partida no encontrada con ID " + dto.getPartidaId());
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                .body("Partida no encontrada con ID " + dto.getPartidaId());
 	    }
 
-	    // Buscar la cava (si aplica)
+	    // Buscar la cava si aplica
 	    Cava cava = null;
 	    if (dto.getCavaId() != null) {
 	        cava = cservice.buscar(dto.getCavaId());
 	        if (cava == null) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cava no encontrada con ID " + dto.getCavaId());
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                    .body("Cava no encontrada con ID " + dto.getCavaId());
 	        }
 	    }
 
-	    // Crear y asignar manualmente la incidencia
+	    // Crear la incidencia
 	    Incidencia incidencia = new Incidencia();
 	    incidencia.setFecha(dto.getFecha());
 	    incidencia.setTipo(dto.getTipo());
 	    incidencia.setCantidad(dto.getCantidad());
-	    incidencia.setPartida(partida);
 	    incidencia.setDetalles(dto.getDetalles());
+	    incidencia.setPartida(partida);
 	    incidencia.setCava(cava);
-	    
-	    if (dto.getTipo() == TipoIncidencia.RIMA){
-		    partida.setBotellasRotas(dto.getCantidad());
-		    partida.setBotellasRima(partida.getBotellasRima()-dto.getCantidad());
-		    pservice.insertar(partida);
-	    }else if(dto.getTipo() == TipoIncidencia.STOCK){
+
+	    if (dto.getTipo() == TipoIncidencia.RIMA) {
+	        partida.setBotellasRotas(partida.getBotellasRotas() + dto.getCantidad());
+	        partida.setBotellasRima(partida.getBotellasRima() - dto.getCantidad());
+	        pservice.modificar(partida);
+	    }
+
+	    else if (dto.getTipo() == TipoIncidencia.STOCK) {
 	        Optional<CavaPartida> cpOptional = cpservice.buscarPorCavaYPartida(
 	                cava.getId().toString(),
 	                partida.getId().toString()
-	            );
+	        );
 
-	            if (cpOptional.isEmpty()) {
-	                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	        if (cpOptional.isEmpty()) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
 	                    .body("No existe relación entre la cava y la partida");
-	            }
-
-	            CavaPartida cp = cpOptional.get();
-
-	            int nuevoStock = cp.getCantidad() - dto.getCantidad();
-	            if (nuevoStock < 0) {
-	                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                    .body("No hay suficiente stock en la cava para esta rotura");
-	            }
-
-	            cp.setCantidad(nuevoStock);
-	            cpservice.insertar(cp);
-
-	            // Actualiza también la partida
-	            partida.setBotellasRotas(partida.getBotellasRotas() + dto.getCantidad());
-	            pservice.insertar(partida);
 	        }
 
-	    
+	        CavaPartida cp = cpOptional.get();
+
+	        int nuevoStock = cp.getCantidad() - dto.getCantidad();
+	        if (nuevoStock < 0) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	                    .body("No hay suficiente stock en la cava para esta rotura");
+	        }
+
+	        cp.setCantidad(nuevoStock);
+	        cpservice.modificar(cp);
+
+	        partida.setBotellasRotas(partida.getBotellasRotas() + dto.getCantidad());
+	        partida.setBotellasStock(partida.getBotellasStock() - dto.getCantidad());
+	        pservice.modificar(partida);
+	    }
 
 	    Incidencia nuevo = iservice.insertar(incidencia);
 	    IncidenciaDto respuesta = mapper.map(nuevo, IncidenciaDto.class);
