@@ -25,6 +25,7 @@ import cava.model.repository.CavaRepository;
 import cava.model.repository.CompraMaterialRepository;
 import cava.model.repository.DeguelleRepository;
 import cava.model.repository.FamiliaRepository;
+import cava.model.repository.IncidenciaRepository;
 import cava.model.repository.MaterialCavaRepository;
 import cava.model.repository.MaterialRepository;
 import cava.model.repository.MovimientoMaterialRepository;
@@ -72,43 +73,50 @@ public class ResetService {
     
     @Autowired
     private CompraMaterialRepository cmRepo;
+    
+    @Autowired
+    private IncidenciaRepository rRepo;
 
     @Transactional
     public void reiniciarBaseDeDatos() {
-        // 1. Ventas (no dependen de nadie, pero sí de CavaPartida)
+    	
+    	// Roturas
+    	rRepo.deleteAll();
+    	
+        // Ventas (no dependen de nadie, pero sí de CavaPartida)
         vRepo.deleteAll();
 
-        // 2. Movimientos (referencian Material y CompraMaterial)
+        // Movimientos (referencian Material y CompraMaterial)
         mmRepo.deleteAll();
 
-        // 3. Relación material-cava (intermedia)
+        // Relación material-cava (intermedia)
         mcRepo.deleteAll();
 
-        // 4. Compras (referencian Material y Proveedor)
+        // Compras (referencian Material y Proveedor)
         cmRepo.deleteAll();
 
-        // 5. Degüelles (referenciados en MovimientoMaterial)
+        // Degüelles (referenciados en MovimientoMaterial)
         dRepo.deleteAll();
 
-        // 6. Relación cava-partida
+        // Relación cava-partida
         cavaPartidaRepo.deleteAll();
 
-        // 7. Partidas
+        // Partidas
         partidaRepo.deleteAll();
 
-        // 8. Cavas (dependen de Familia)
+        // Cavas (dependen de Familia)
         cavaRepo.deleteAll();
 
-        // 9. Materiales (dependen de Categoría y Familia)
+        // Materiales (dependen de Categoría y Familia)
         matRepo.deleteAll();
 
-        // 10. Proveedores
+        // Proveedores
         prepo.deleteAll();
 
-        // 11. Categorías
+        // Categorías
         catRepo.deleteAll();
 
-        // 12. Familias
+        // Familias
         fRepo.deleteAll();
         
         
@@ -118,10 +126,10 @@ public class ResetService {
         fRepo.saveAll(List.of(f1, f2, f3));
         
         
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", " 25% Parellada", null, 2.2);
-        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.2);
-        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.2);
-        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, true, "Verde", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 2.02);
+        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", " 25% Parellada", null, 2.2);
+        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.2);
+        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.2);
+        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, 0, true, "Verde", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 2.02);
         partidaRepo.saveAll(List.of(p1, p2, p3, p4));
      
     
