@@ -2,6 +2,7 @@ package cava.model.restcontroller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
@@ -41,7 +42,7 @@ import jakarta.transaction.Transactional;
 @RequestMapping("/api/incidencia")
 @CrossOrigin(origins = "*")
 public class IncidenciaController {
-	
+
 	@Autowired
 	private IncidenciaService iservice;
 	@Autowired
@@ -52,7 +53,7 @@ public class IncidenciaController {
 	private CavaPartidaService cpservice;
 	@Autowired
 	private ModelMapper mapper;
-	
+
 	// Obtener todos los proveedores
 	@GetMapping
 	public ResponseEntity<?> obtenerTodos() {
@@ -67,7 +68,7 @@ public class IncidenciaController {
 	    return ResponseEntity.ok(dtos);
 	}
 
-	
+
 	// Obtener un proveedor por ID
 	@GetMapping("/{id}")
 	public ResponseEntity<?> obtenerUno(@PathVariable Long id) {
@@ -80,7 +81,36 @@ public class IncidenciaController {
 	    }
 	}
 
-	
+	// Obtener todos los proveedores
+	@GetMapping("/partida/{id}")
+	public ResponseEntity<?> obtenerTodosPartida(@PathVariable String id) {
+		List<Incidencia> incidencias = iservice.findByPartidaId(id);
+		List<IncidenciaDto> dtos = new ArrayList<>();
+
+		for (Incidencia i : incidencias) {
+			IncidenciaDto dto = mapper.map(i, IncidenciaDto.class);
+			dtos.add(dto);
+		}
+
+		return ResponseEntity.ok(dtos);
+	}
+
+
+	// Obtener todos los proveedores
+	@GetMapping("/cava/{id}")
+	public ResponseEntity<?> obtenerTodosCava(@PathVariable String id) {
+		List<Incidencia> incidencias = iservice.findByCavaId(id);
+		List<IncidenciaDto> dtos = new ArrayList<>();
+
+		for (Incidencia i : incidencias) {
+			IncidenciaDto dto = mapper.map(i, IncidenciaDto.class);
+			dtos.add(dto);
+		}
+
+		return ResponseEntity.ok(dtos);
+	}
+
+
 	@PostMapping("/insertar")
 	@Transactional
 	public ResponseEntity<?> insertarUno(@RequestBody IncidenciaDto dto) {
@@ -91,7 +121,7 @@ public class IncidenciaController {
 	                .body("Partida no encontrada con ID " + dto.getPartidaId());
 	    }
 
-	    // Buscar la cava si aplica
+	    // Buscar el cava si aplica
 	    Cava cava = null;
 	    if (dto.getCavaId() != null) {
 	        cava = cservice.buscar(dto.getCavaId());
@@ -117,10 +147,7 @@ public class IncidenciaController {
 	    }
 
 	    else if (dto.getTipo() == TipoIncidencia.STOCK) {
-	        Optional<CavaPartida> cpOptional = cpservice.buscarPorCavaYPartida(
-	                cava.getId().toString(),
-	                partida.getId().toString()
-	        );
+			Optional<CavaPartida> cpOptional = cpservice.buscarPorCavaYPartida(cava.getId(),partida.getId());
 
 	        if (cpOptional.isEmpty()) {
 	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -132,7 +159,7 @@ public class IncidenciaController {
 	        int nuevoStock = cp.getCantidad() - dto.getCantidad();
 	        if (nuevoStock < 0) {
 	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                    .body("No hay suficiente stock en la cava para esta rotura");
+	                    .body("No hay suficiente stock en esta partida");
 	        }
 
 	        cp.setCantidad(nuevoStock);
@@ -148,42 +175,94 @@ public class IncidenciaController {
 	    return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
 	}
 
-	
-	@PutMapping("/modificar/{id}")
-	public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody IncidenciaDto dto) {
-	    Incidencia existente = iservice.buscar(id);
-	    if (existente == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la incidencia con ID " + id);
-	    }
 
-	    // Buscar la partida asociada
-	    Partida partida = pservice.buscar(dto.getPartidaId());
-	    if (partida == null) {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partida no encontrada con ID " + dto.getPartidaId());
-	    }
+    @Transactional
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody IncidenciaDto dto) {
+        Incidencia existente = iservice.buscar(id);
+        if (existente == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la incidencia con ID " + id);
+        }
 
-	    // Buscar la cava (si aplica)
-	    Cava cava = null;
-	    if (dto.getCavaId() != null) {
-	        cava = cservice.buscar(dto.getCavaId());
-	        if (cava == null) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cava no encontrada con ID " + dto.getCavaId());
-	        }
-	    }
+        // Validar nueva partida
+        Partida nuevaPartida = pservice.buscar(dto.getPartidaId());
+        if (nuevaPartida == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Partida no encontrada con ID " + dto.getPartidaId());
+        }
 
-	    // Actualizar campos
-	    existente.setFecha(dto.getFecha());
-	    existente.setTipo(dto.getTipo());
-	    existente.setCantidad(dto.getCantidad());
-	    existente.setPartida(partida);
-	    existente.setCava(cava);
+        // Validar nueva cava si aplica
+        Cava nuevaCava = null;
+        if (dto.getCavaId() != null) {
+            nuevaCava = cservice.buscar(dto.getCavaId());
+            if (nuevaCava == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cava no encontrada con ID " + dto.getCavaId());
+            }
+        }
 
-	    Incidencia actualizado = iservice.modificar(existente);
-	    IncidenciaDto respuesta = mapper.map(actualizado, IncidenciaDto.class);
-	    return ResponseEntity.ok(respuesta);
-	}
+        // Validar relación y stock suficiente (si tipo es STOCK)
+        CavaPartida nuevaRelacionCP = null;
+        if (dto.getTipo() == TipoIncidencia.STOCK && nuevaCava != null) {
+            Optional<CavaPartida> cpOpt = cpservice.buscarPorCavaYPartida(nuevaCava.getId(), nuevaPartida.getId());
+            if (cpOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No existe relación entre la cava y la partida");
+            }
 
-	
+            nuevaRelacionCP = cpOpt.get();
+            int nuevoStock = nuevaRelacionCP.getCantidad() - dto.getCantidad();
+            if (nuevoStock < 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No hay suficiente stock en la cava para esta rotura");
+            }
+        }
+
+        // Si todas las validaciones pasan, revertir efectos anteriores
+        Partida partidaAnterior = existente.getPartida();
+        Cava cavaAnterior = existente.getCava();
+
+        if (existente.getTipo() == TipoIncidencia.RIMA) {
+            partidaAnterior.setBotellasRotas(partidaAnterior.getBotellasRotas() - existente.getCantidad());
+            partidaAnterior.setBotellasRima(partidaAnterior.getBotellasRima() + existente.getCantidad());
+            pservice.modificar(partidaAnterior);
+        } else if (existente.getTipo() == TipoIncidencia.STOCK && cavaAnterior != null) {
+            Optional<CavaPartida> cpOpt = cpservice.buscarPorCavaYPartida(cavaAnterior.getId(), partidaAnterior.getId());
+            if (cpOpt.isPresent()) {
+                CavaPartida cp = cpOpt.get();
+                cp.setCantidad(cp.getCantidad() + existente.getCantidad());
+                cpservice.modificar(cp);
+
+                partidaAnterior.setBotellasRotas(partidaAnterior.getBotellasRotas() - existente.getCantidad());
+                partidaAnterior.setBotellasStock(partidaAnterior.getBotellasStock() + existente.getCantidad());
+                pservice.modificar(partidaAnterior);
+            }
+        }
+
+        // Aplicar efectos nuevos
+        if (dto.getTipo() == TipoIncidencia.RIMA) {
+            nuevaPartida.setBotellasRotas(nuevaPartida.getBotellasRotas() + dto.getCantidad());
+            nuevaPartida.setBotellasRima(nuevaPartida.getBotellasRima() - dto.getCantidad());
+            pservice.modificar(nuevaPartida);
+        } else if (dto.getTipo() == TipoIncidencia.STOCK && nuevaRelacionCP != null) {
+            nuevaRelacionCP.setCantidad(nuevaRelacionCP.getCantidad() - dto.getCantidad());
+            cpservice.modificar(nuevaRelacionCP);
+
+            nuevaPartida.setBotellasRotas(nuevaPartida.getBotellasRotas() + dto.getCantidad());
+            nuevaPartida.setBotellasStock(nuevaPartida.getBotellasStock() - dto.getCantidad());
+            pservice.modificar(nuevaPartida);
+        }
+
+        // Actualizar incidencia
+        existente.setTipo(dto.getTipo());
+        existente.setCantidad(dto.getCantidad());
+        existente.setDetalles(dto.getDetalles());
+        existente.setFecha(dto.getFecha());
+        existente.setPartida(nuevaPartida);
+        existente.setCava(nuevaCava);
+
+        iservice.modificar(existente);
+
+        return ResponseEntity.ok(Map.of("mensaje", "Incidencia modificada correctamente"));
+    }
+
+
 	// Borrar proveedor
 	@DeleteMapping("/borrar/{id}")
 	public ResponseEntity<?> borrar(@PathVariable Long id) {
@@ -191,8 +270,38 @@ public class IncidenciaController {
 	    if (existente == null) {
 	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la incidencia");
 	    }
+		Partida partida = existente.getPartida();
+		// Buscar el cava si aplica
+		Cava cava = existente.getCava();
+
+		if (existente.getTipo() == TipoIncidencia.RIMA) {
+			partida.setBotellasRotas(partida.getBotellasRotas() - existente.getCantidad());
+			partida.setBotellasRima(partida.getBotellasRima() + existente.getCantidad());
+			pservice.modificar(partida);
+		}
+
+		else if (existente.getTipo() == TipoIncidencia.STOCK) {
+			Optional<CavaPartida> cpOptional = cpservice.buscarPorCavaYPartida(cava.getId(),partida.getId());
+
+			if (cpOptional.isEmpty()) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+						.body("No existe relación entre la cava y la partida");
+			}
+
+			CavaPartida cp = cpOptional.get();
+
+			int nuevoStock = cp.getCantidad() + existente.getCantidad();
+
+			cp.setCantidad(nuevoStock);
+			cpservice.modificar(cp);
+
+			partida.setBotellasRotas(partida.getBotellasRotas() - existente.getCantidad());
+			partida.setBotellasStock(partida.getBotellasStock() + existente.getCantidad());
+			pservice.modificar(partida);
+		}
+
 	    iservice.borrar(id);
 	    return ResponseEntity.noContent().build();
 	}
-	
+
 }

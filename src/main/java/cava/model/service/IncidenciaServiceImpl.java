@@ -57,4 +57,13 @@ public class IncidenciaServiceImpl implements IncidenciaService{
 	    }
 	}
 
+	@Override
+	public List<Incidencia> findByPartidaId(String id) {
+		return irepo.findByPartidaId(id);
+	}
+
+	@Override
+	public List<Incidencia> findByCavaId(String id) {
+		return irepo.findByCavaId(id);
+	}
 }

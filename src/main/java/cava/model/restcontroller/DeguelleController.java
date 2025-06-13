@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import cava.model.entity.*;
+import cava.model.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,21 +26,6 @@ import org.springframework.web.bind.annotation.RestController;
 import cava.model.dto.DeguelleDto;
 import cava.model.dto.MaterialDto;
 import cava.model.dto.MovimientoMaterialDto;
-import cava.model.entity.Cava;
-import cava.model.entity.CavaPartida;
-import cava.model.entity.Material;
-import cava.model.entity.MaterialCava;
-import cava.model.entity.Deguelle;
-import cava.model.entity.MovimientoMaterial;
-import cava.model.entity.Partida;
-import cava.model.entity.TipoMovimientoMaterial;
-import cava.model.service.CavaPartidaService;
-import cava.model.service.CavaService;
-import cava.model.service.MaterialCavaService;
-import cava.model.service.MaterialService;
-import cava.model.service.DeguelleService;
-import cava.model.service.MovimientoMaterialService;
-import cava.model.service.PartidaService;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -60,6 +47,8 @@ public class DeguelleController {
 	private MaterialCavaService mcservice;
 	@Autowired
 	private CavaPartidaService cpservice;
+	@Autowired
+	private IncidenciaService iservice;
 	@Autowired
 	private ModelMapper mapper;
 
@@ -106,6 +95,17 @@ public class DeguelleController {
 	    partida.setBotellasRima(nuevaCantidadRima);
 	    partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
 	    partida.setBotellasMerma(partida.getBotellasMerma()+ dto.getMerma());
+
+
+		Incidencia merma = new Incidencia();
+		merma.setCantidad(dto.getMerma());
+		merma.setCava(cava);
+		merma.setPartida(partida);
+		merma.setTipo(TipoIncidencia.DEGÜELLE);
+		merma.setFecha(dto.getFecha());
+		merma.setDetalles("Merma del deguelle " + dto.getLot());
+		iservice.insertar(merma);
+
 
 	    // Lista para acumular movimientos creados
 	    List<MovimientoMaterial> movimientosCreados = new ArrayList<>();
