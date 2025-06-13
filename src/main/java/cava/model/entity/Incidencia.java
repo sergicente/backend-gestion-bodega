@@ -39,4 +39,8 @@ public class Incidencia {
 	@ManyToOne
 	@JoinColumn(name = "cava_id", nullable = true)
 	private Cava cava;
+
+	@ManyToOne
+	@JoinColumn(name = "deguelle_id", nullable = true)
+	private Deguelle deguelle;
 }

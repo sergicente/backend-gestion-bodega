@@ -13,6 +13,7 @@ import java.util.List;
 public interface IncidenciaRepository extends JpaRepository<Incidencia, Long>{
     List<Incidencia> findByPartidaId(String id);
     List<Incidencia> findByCavaId(String id);
+    Incidencia findByDeguelleId(Long id);
 
 
 }

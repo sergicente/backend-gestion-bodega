@@ -141,7 +141,7 @@ public class IncidenciaController {
 	    incidencia.setCava(cava);
 
 	    if (dto.getTipo() == TipoIncidencia.RIMA) {
-	        partida.setBotellasRotas(partida.getBotellasRotas() + dto.getCantidad());
+	        partida.setBotellasMerma(partida.getBotellasMerma() + dto.getCantidad());
 	        partida.setBotellasRima(partida.getBotellasRima() - dto.getCantidad());
 	        pservice.modificar(partida);
 	    }
@@ -165,7 +165,7 @@ public class IncidenciaController {
 	        cp.setCantidad(nuevoStock);
 	        cpservice.modificar(cp);
 
-	        partida.setBotellasRotas(partida.getBotellasRotas() + dto.getCantidad());
+	        partida.setBotellasMerma(partida.getBotellasMerma() + dto.getCantidad());
 	        partida.setBotellasStock(partida.getBotellasStock() - dto.getCantidad());
 	        pservice.modificar(partida);
 	    }
@@ -219,7 +219,7 @@ public class IncidenciaController {
         Cava cavaAnterior = existente.getCava();
 
         if (existente.getTipo() == TipoIncidencia.RIMA) {
-            partidaAnterior.setBotellasRotas(partidaAnterior.getBotellasRotas() - existente.getCantidad());
+            partidaAnterior.setBotellasMerma(partidaAnterior.getBotellasMerma() - existente.getCantidad());
             partidaAnterior.setBotellasRima(partidaAnterior.getBotellasRima() + existente.getCantidad());
             pservice.modificar(partidaAnterior);
         } else if (existente.getTipo() == TipoIncidencia.STOCK && cavaAnterior != null) {
@@ -229,7 +229,7 @@ public class IncidenciaController {
                 cp.setCantidad(cp.getCantidad() + existente.getCantidad());
                 cpservice.modificar(cp);
 
-                partidaAnterior.setBotellasRotas(partidaAnterior.getBotellasRotas() - existente.getCantidad());
+                partidaAnterior.setBotellasMerma(partidaAnterior.getBotellasMerma() - existente.getCantidad());
                 partidaAnterior.setBotellasStock(partidaAnterior.getBotellasStock() + existente.getCantidad());
                 pservice.modificar(partidaAnterior);
             }
@@ -237,14 +237,14 @@ public class IncidenciaController {
 
         // Aplicar efectos nuevos
         if (dto.getTipo() == TipoIncidencia.RIMA) {
-            nuevaPartida.setBotellasRotas(nuevaPartida.getBotellasRotas() + dto.getCantidad());
+            nuevaPartida.setBotellasMerma(nuevaPartida.getBotellasMerma() + dto.getCantidad());
             nuevaPartida.setBotellasRima(nuevaPartida.getBotellasRima() - dto.getCantidad());
             pservice.modificar(nuevaPartida);
         } else if (dto.getTipo() == TipoIncidencia.STOCK && nuevaRelacionCP != null) {
             nuevaRelacionCP.setCantidad(nuevaRelacionCP.getCantidad() - dto.getCantidad());
             cpservice.modificar(nuevaRelacionCP);
 
-            nuevaPartida.setBotellasRotas(nuevaPartida.getBotellasRotas() + dto.getCantidad());
+            nuevaPartida.setBotellasMerma(nuevaPartida.getBotellasMerma() + dto.getCantidad());
             nuevaPartida.setBotellasStock(nuevaPartida.getBotellasStock() - dto.getCantidad());
             pservice.modificar(nuevaPartida);
         }
@@ -263,7 +263,7 @@ public class IncidenciaController {
     }
 
 
-	// Borrar proveedor
+	// Borrar incidencia
 	@DeleteMapping("/borrar/{id}")
 	public ResponseEntity<?> borrar(@PathVariable Long id) {
 		Incidencia existente = iservice.buscar(id);
@@ -275,7 +275,7 @@ public class IncidenciaController {
 		Cava cava = existente.getCava();
 
 		if (existente.getTipo() == TipoIncidencia.RIMA) {
-			partida.setBotellasRotas(partida.getBotellasRotas() - existente.getCantidad());
+			partida.setBotellasMerma(partida.getBotellasMerma() - existente.getCantidad());
 			partida.setBotellasRima(partida.getBotellasRima() + existente.getCantidad());
 			pservice.modificar(partida);
 		}
@@ -295,7 +295,7 @@ public class IncidenciaController {
 			cp.setCantidad(nuevoStock);
 			cpservice.modificar(cp);
 
-			partida.setBotellasRotas(partida.getBotellasRotas() - existente.getCantidad());
+			partida.setBotellasMerma(partida.getBotellasMerma() - existente.getCantidad());
 			partida.setBotellasStock(partida.getBotellasStock() + existente.getCantidad());
 			pservice.modificar(partida);
 		}

@@ -19,5 +19,5 @@ public class IncidenciaDto {
     private String cavaId;
     private String cavaNombre;
 	private String detalles;
-
+    private Long deguelleId;
 }

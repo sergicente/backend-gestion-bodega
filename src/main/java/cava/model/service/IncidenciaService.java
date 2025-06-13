@@ -7,5 +7,6 @@ import java.util.List;
 public interface IncidenciaService extends InterfaceGenericoCrud<Incidencia, Long>{
     List<Incidencia> findByPartidaId(String id);
     List<Incidencia> findByCavaId(String id);
+    Incidencia findByDeguelleId (Long id);
 
 }
