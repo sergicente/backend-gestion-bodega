@@ -13,6 +13,7 @@ public class DeguelleDto {
 	private Long id;
 	private LocalDate fecha;
 	private String lot;
+	private String lotTap;
 	private int cantidad;
 	private int merma;
 	private String partidaId;

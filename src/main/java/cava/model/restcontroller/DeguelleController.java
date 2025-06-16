@@ -134,6 +134,7 @@ public class DeguelleController {
 	    deguelle.setCantidad(dto.getCantidad());
 	    deguelle.setMerma(dto.getMerma());
 	    deguelle.setLot(dto.getLot());
+		deguelle.setLotTap(dto.getLotTap());
 	    deguelle.setLimpieza(dto.isLimpieza());
 	    deguelle.setObservaciones(dto.getObservaciones());
 	    deguelle.setLicor(dto.getLicor());
@@ -166,62 +167,7 @@ public class DeguelleController {
 	    return ResponseEntity.status(HttpStatus.CREATED).body(deguelleDto);
 	}
 
-//	@Transactional
-//	@PutMapping("/modificar/{id}")
-//	public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleDto dto) {
-//	    try {
-//	        Deguelle degOriginal = mservice.buscar(id);
-//	        if (degOriginal == null) {
-//	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüellé no encontrado");
-//	        }
-//
-//	        // 1. Verificaciones previas
-//	        try {
-//	            verificarReversionPosible(degOriginal);
-//	            verificarStockMateriales(dto, degOriginal.getCantidad());
-//	        } catch (IllegalArgumentException ex) {
-//	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//	                .body("No se puede modificar el degüellé: " + ex.getMessage());
-//	        }
-//
-//	        // 2. Verificar que no se haya vendido
-//	        Optional<CavaPartida> relacion = cpservice.buscarPorCavaYPartida(degOriginal.getCava().getId(), degOriginal.getPartida().getId());
-//	        if (relacion.isPresent() && relacion.get().getVendido() >= degOriginal.getCantidad()) {
-//	            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//	                    .body("No se puede modificar el degüelle porque ya se han vendido esas botellas.");
-//	        }
-//
-//	        // 3. Revertir el degüelle anterior
-//	        borrar(id);
-//
-//	        // 4. Insertar nueva relación si es necesario
-//	        Partida nuevaPartida = pservice.buscar(dto.getPartidaId());
-//	        Cava nuevaCava = cservice.buscar(dto.getCavaId());
-//
-//	        Optional<CavaPartida> relacionNuevaOpt = cpservice.buscarPorCavaYPartida(nuevaCava.getId(), nuevaPartida.getId());
-//	        CavaPartida nuevaRelacion;
-//	        if (relacionNuevaOpt.isPresent()) {
-//	            nuevaRelacion = relacionNuevaOpt.get();
-//	            nuevaRelacion.setCantidad(nuevaRelacion.getCantidad() + dto.getCantidad());
-//	        } else {
-//	            nuevaRelacion = new CavaPartida();
-//	            nuevaRelacion.setCava(nuevaCava);
-//	            nuevaRelacion.setPartida(nuevaPartida);
-//	            nuevaRelacion.setCantidad(dto.getCantidad());
-//	            nuevaRelacion.setVendido(0);
-//	            nuevaRelacion.setActual(true);
-//	            nuevaRelacion.setUltimaActualizacion(LocalDateTime.now());
-//	        }
-//	        cpservice.insertar(nuevaRelacion);
-//
-//	        // 5. Insertar nuevo degüelle
-//	        return insertarUno(dto);
-//
-//	    } catch (Exception e) {
-//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//	            .body("Error al modificar el degüellé: " + e.getMessage());
-//	    }
-//	}
+
 @Transactional
 @PutMapping("/modificar/{id}")
 public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleDto dto) {

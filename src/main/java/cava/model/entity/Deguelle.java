@@ -27,6 +27,8 @@ public class Deguelle {
 	private LocalDate fecha;
 		
 	private String lot;
+
+	private String lotTap;
 	
 	private int cantidad;
 	
