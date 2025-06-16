@@ -25,7 +25,6 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/compra-material")
-@CrossOrigin(origins = "*")
 public class CompraMaterialController {
 
     @Autowired

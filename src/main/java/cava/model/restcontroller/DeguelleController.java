@@ -26,7 +26,6 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/deguelle")
-@CrossOrigin(origins = "*")
 public class DeguelleController {
 
 	@Autowired

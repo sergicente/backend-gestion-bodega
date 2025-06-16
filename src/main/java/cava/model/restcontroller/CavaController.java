@@ -31,7 +31,6 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/cava")
-@CrossOrigin(origins = "*")
 public class CavaController {
 	
 	@Autowired

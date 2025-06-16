@@ -30,7 +30,6 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/movimiento_material")
-@CrossOrigin(origins = "*")
 public class MovimientoMaterialController {
 	
 	@Autowired

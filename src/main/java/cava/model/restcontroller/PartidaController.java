@@ -24,7 +24,6 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/partida")
-@CrossOrigin(origins = "*")
 public class PartidaController {
 	
 	@Autowired

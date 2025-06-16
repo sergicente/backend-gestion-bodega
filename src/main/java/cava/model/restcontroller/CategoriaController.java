@@ -33,7 +33,6 @@ import cava.model.service.MaterialService;
 
 @RestController
 @RequestMapping("/api/categoria")
-@CrossOrigin(origins = "*")
 public class CategoriaController {
 	
 	@Autowired

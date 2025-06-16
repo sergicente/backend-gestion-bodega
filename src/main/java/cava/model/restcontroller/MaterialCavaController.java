@@ -26,7 +26,6 @@ import cava.model.service.MaterialService;
 
 @RestController
 @RequestMapping("/api/materialcava")
-@CrossOrigin(origins = "*")
 public class MaterialCavaController {
 
 	@Autowired

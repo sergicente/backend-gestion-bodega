@@ -27,7 +27,6 @@ import cava.model.service.VentaService;
 
 @RestController
 @RequestMapping("/api/proveedor")
-@CrossOrigin(origins = "*")
 public class ProveedorController {
 	
 	@Autowired

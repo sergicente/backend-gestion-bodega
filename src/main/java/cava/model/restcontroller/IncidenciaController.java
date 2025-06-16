@@ -40,7 +40,6 @@ import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/incidencia")
-@CrossOrigin(origins = "*")
 public class IncidenciaController {
 
 	@Autowired

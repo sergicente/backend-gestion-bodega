@@ -38,7 +38,6 @@ import cava.model.service.PartidaService;
 
 @RestController
 @RequestMapping("/api/cavapartida")
-@CrossOrigin(origins = "*")
 public class CavaPartidaController {
 
 	@Autowired

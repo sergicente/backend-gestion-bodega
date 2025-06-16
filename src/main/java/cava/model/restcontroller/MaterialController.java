@@ -29,7 +29,6 @@ import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @RequestMapping("/api/material")
-@CrossOrigin(origins = "*")
 public class MaterialController {
 	
 	@Autowired
