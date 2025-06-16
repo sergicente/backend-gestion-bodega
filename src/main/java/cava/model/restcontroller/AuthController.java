@@ -1,4 +1,5 @@
 package cava.model.restcontroller;
+import cava.configuration.JwtUtil;
 import cava.model.dto.LoginRequest;
 import cava.model.dto.LoginResponse;
 import cava.model.entity.Usuario;
@@ -20,6 +21,9 @@ public class AuthController {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostMapping
@@ -37,7 +41,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Credenciales incorrectas");
         }
-
-        return ResponseEntity.ok(new LoginResponse("Login correcto"));
+        String token = jwtUtil.generateToken(usuario.getEmail(), usuario.getRol().name());
+        String mensaje = "Login exitoso";
+        String nombre = usuario.getNombre();
+        String rol = usuario.getRol().name();
+        return ResponseEntity.ok(
+                new LoginResponse(token, mensaje, nombre, rol)
+        );
     }
 }

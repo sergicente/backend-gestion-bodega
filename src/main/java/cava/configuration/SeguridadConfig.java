@@ -4,6 +4,7 @@ import cava.model.service.UsuarioDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import java.util.List;
 
 @Configuration
@@ -26,19 +27,22 @@ public class SeguridadConfig {
     @Autowired
     private UsuarioDetailsService usuarioDetailsService;
 
+    @Autowired
+    private JwtFilter jwtFilter;
+
     @Bean
-    public SecurityFilterChain filtro(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults()) // <- AÑADE ESTO
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/api/**").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .formLogin(AbstractHttpConfigurer::disable) // 🚫 Desactiva el login por formulario
-                .httpBasic(AbstractHttpConfigurer::disable) // 🚫 Desactiva basic auth
-                .userDetailsService(usuarioDetailsService)
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -64,3 +68,4 @@ public PasswordEncoder passwordEncoder() {
     return NoOpPasswordEncoder.getInstance(); // ¡no cifra, compara texto plano!
 }
 }
+

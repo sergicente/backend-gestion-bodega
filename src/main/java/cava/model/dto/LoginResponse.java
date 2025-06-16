@@ -1,18 +1,16 @@
 package cava.model.dto;
 
-public class LoginResponse {
-    private String mensaje;
-    private String rol;
-    private String nombre;
-    private String token;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    public LoginResponse(String mensaje) {
-        this.mensaje = mensaje;
-    }
-    public String getMensaje() {
-        return mensaje;
-    }
-    public void setMensaje(String mensaje) {
-        this.mensaje = mensaje;
-    }
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class LoginResponse {
+    private String token;
+    private String mensaje;
+    private String nombre;
+    private String rol;
+
 }
