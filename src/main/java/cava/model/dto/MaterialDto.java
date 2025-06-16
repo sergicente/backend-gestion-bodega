@@ -17,5 +17,6 @@ public class MaterialDto {
     private String familiaNombre;
     private String observaciones;
     private int cantidad;
+    private int cantidadMinima;
     private float cantidadGastada;
 }

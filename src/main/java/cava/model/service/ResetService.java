@@ -126,10 +126,10 @@ public class ResetService {
         fRepo.saveAll(List.of(f1, f2, f3));
         
         
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, false, "Verde", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.01);
-        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
-        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verde", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
-        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, true, "Verde", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
+        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, false, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.01);
+        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
+        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
+        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, true, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
         partidaRepo.saveAll(List.of(p1, p2, p3, p4));
      
     
@@ -163,12 +163,12 @@ public class ResetService {
         
         
         
-        Material m1 = new Material(null, "Cápsula Mas Xarot", (float)(1605.0 / 30000), c1, f2, null, 30000, 1f);
-        Material m2 = new Material(null, "Etiqueta Mas Xarot", (float)(1520.0 / 10000), c2, f2, null, 10000, 1f);
-        Material m3 = new Material(null, "Caja Mas Xarot", (float)(830.0 / 1000), c3, f2, null, 1000, 0.17f);
-        Material m4 = new Material(null, "Caja Montsant", (float)(810.0 / 1000), c3, f1, null, 1000, 0.17f);
-        Material m5 = new Material(null, "Collarín Mas Xarot", (float)(105.0 / 1000), c4, f2, null, 10000, 1f);
-        Material m6 = new Material(null, "Contraetiqueta Mas Xarot", (float)(75.0 / 1000), c5, f2, null, 10000, 1f);
+        Material m1 = new Material(null, "Cápsula Mas Xarot", (float)(1605.0 / 30000), c1, f2, null, 30000, 1000, 1f);
+        Material m2 = new Material(null, "Etiqueta Mas Xarot", (float)(1520.0 / 10000), c2, f2, null, 10000, 10000, 1f);
+        Material m3 = new Material(null, "Caja Mas Xarot", (float)(830.0 / 1000), c3, f2, null, 1000, 200, 0.17f);
+        Material m4 = new Material(null, "Caja Montsant", (float)(810.0 / 1000), c3, f1, null, 1000, 200, 0.17f);
+        Material m5 = new Material(null, "Collarín Mas Xarot", (float)(105.0 / 1000), c4, f2, null, 10000, 1000, 1f);
+        Material m6 = new Material(null, "Contraetiqueta Mas Xarot", (float)(75.0 / 1000), c5, f2, null, 10000, 1000, 1f);
         matRepo.saveAll(List.of(m1, m2, m3, m4, m5, m6));
 
         

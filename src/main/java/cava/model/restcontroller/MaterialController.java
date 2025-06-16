@@ -40,8 +40,8 @@ public class MaterialController {
 	private CategoriaService catservice;
 	@Autowired
 	private ModelMapper mapper;
-	
-	
+
+
     // Obtener todas las partidas
 	@GetMapping
 	public ResponseEntity<?> obtenerTodos() {
@@ -134,10 +134,7 @@ public class MaterialController {
             existente.setCantidad(materialDto.getCantidad());
 
             Material actualizado = mservice.modificar(existente);
-
             MaterialDto actualizadoDto = mapper.map(actualizado, MaterialDto.class);
-
-
             return ResponseEntity.ok(actualizadoDto);
 
         } catch (EntityNotFoundException e) {
@@ -158,6 +155,20 @@ public class MaterialController {
         }
         mservice.borrar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/alertas")
+    public ResponseEntity<List<MaterialDto>> materialesBajoMinimo() {
+        List<Material> todos = mservice.buscarTodos();
+        List<MaterialDto> alertas = new ArrayList<>();
+        for (Material m : todos) {
+            if (m.getCantidad() <= m.getCantidadMinima()) {
+                MaterialDto dto = mapper.map(m, MaterialDto.class);
+                alertas.add(dto);
+            }
+        }
+        System.out.println("Entrando en alertas, total materiales: " + todos.size());
+        return ResponseEntity.ok(alertas);
     }
 	
 }
