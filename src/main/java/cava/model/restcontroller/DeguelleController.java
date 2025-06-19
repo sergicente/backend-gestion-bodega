@@ -92,9 +92,6 @@ public class DeguelleController {
 	    partida.setBotellasMerma(partida.getBotellasMerma()+ dto.getMerma());
 
 
-
-
-
 	    // Lista para acumular movimientos creados
 	    List<MovimientoMaterial> movimientosCreados = new ArrayList<>();
 
@@ -103,10 +100,6 @@ public class DeguelleController {
 	        Material material = mat.getMaterial();
 	        int cantidadARestar = Math.round(mat.getMaterial().getCantidadGastada() * dto.getCantidad());
 	        int nuevoStock = material.getCantidad() - cantidadARestar;
-
-//	        if (nuevoStock < 0) {
-//	            throw new IllegalArgumentException("No hay suficiente stock del material: " + material.getNombre());
-//	        }
 
 	        material.setCantidad(nuevoStock);
 	        matservice.insertar(material);
@@ -194,7 +187,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	partidaAnterior.setBotellasMerma(partidaAnterior.getBotellasMerma() - existente.getMerma());
 	pservice.modificar(partidaAnterior);
 
-	// ✅ Revertir cantidad en la CavaPartida anterior
+	// Revertir cantidad en la CavaPartida anterior
 	Optional<CavaPartida> cpAnteriorOptional = cpservice.buscarPorCavaYPartida(cavaAnterior.getId(), partidaAnterior.getId());
 	if (cpAnteriorOptional.isPresent()) {
 	    CavaPartida cpAnterior = cpAnteriorOptional.get();
@@ -218,7 +211,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	nuevaPartida.setBotellasMerma(nuevaPartida.getBotellasMerma() + dto.getMerma());
 	pservice.modificar(nuevaPartida);
 
-	// ✅ Actualizar cantidad en CavaPartida
+	// Actualizar cantidad en CavaPartida
 	Optional<CavaPartida> cpOptional = cpservice.buscarPorCavaYPartida(nuevaCava.getId(), nuevaPartida.getId());
 	if (cpOptional.isPresent()) {
 	    CavaPartida cp = cpOptional.get();
@@ -303,7 +296,9 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 
 			// Borrar mermas
 			Incidencia merma = iservice.findByDeguelleId(deguelle.getId());
-			iservice.borrar(merma.getId());
+			if (merma != null) {
+				iservice.borrar(merma.getId());
+			}
 
 	        dservice.borrar(id);
 

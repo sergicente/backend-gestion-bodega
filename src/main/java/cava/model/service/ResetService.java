@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import cava.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -19,19 +20,6 @@ import cava.model.entity.MovimientoMaterial;
 import cava.model.entity.Partida;
 import cava.model.entity.Proveedor;
 import cava.model.entity.TipoMovimientoMaterial;
-import cava.model.repository.CategoriaRepository;
-import cava.model.repository.CavaPartidaRepository;
-import cava.model.repository.CavaRepository;
-import cava.model.repository.CompraMaterialRepository;
-import cava.model.repository.DeguelleRepository;
-import cava.model.repository.FamiliaRepository;
-import cava.model.repository.IncidenciaRepository;
-import cava.model.repository.MaterialCavaRepository;
-import cava.model.repository.MaterialRepository;
-import cava.model.repository.MovimientoMaterialRepository;
-import cava.model.repository.PartidaRepository;
-import cava.model.repository.ProveedorRepository;
-import cava.model.repository.VentaRepository;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -77,8 +65,13 @@ public class ResetService {
     @Autowired
     private IncidenciaRepository rRepo;
 
+    @Autowired
+    private LogRepository lRepo;
+
     @Transactional
     public void reiniciarBaseDeDatos() {
+
+        lRepo.deleteAll();
     	
     	// Roturas
     	rRepo.deleteAll();
@@ -126,10 +119,10 @@ public class ResetService {
         fRepo.saveAll(List.of(f1, f2, f3));
         
         
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, false, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
+        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, true, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
         Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
         Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
-        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, true, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
+        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, false, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
         Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", "", "2", null, 2.10);
         Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", "", "", null, 2.20);
 
@@ -137,18 +130,18 @@ public class ResetService {
      
     
         Cava cava1 = new Cava("21", "Mas Xarot Brut", true, f2, null, null);
-        Cava cava2 = new Cava("24", "Mas Xarot Brut Nature", true, f2, null, null);
-        Cava cava3 = new Cava("25", "Mas Xarot Enoteca", false, f2, null, null);
+        Cava cava2 = new Cava("23", "Mas Xarot Brut Nature", true, f2, null, null);
+        Cava cava3 = new Cava("25", "Mas Xarot Enoteca", true, f2, null, null);
         Cava cava4 = new Cava("22", "Mas Xarot Barcelona", false, f2, null, null);
-        cavaRepo.saveAll(List.of(cava1, cava2, cava3, cava4));
+       Cava cava5 = new Cava("24", "Mas Xarot Pinot Noir", true, f2, null, null);
+        cavaRepo.saveAll(List.of(cava1, cava2, cava3, cava4, cava5));
         
-        CavaPartida r1 = new CavaPartida(null, cava1, p1, 0, 0, false, LocalDateTime.now());
-        CavaPartida r2 = new CavaPartida(null, cava1, p2, 0, 0, false, LocalDateTime.now());
         CavaPartida r3 = new CavaPartida(null, cava1, p3, 0, 0, true, LocalDateTime.now());
         CavaPartida r4 = new CavaPartida(null, cava2, p2, 0, 0, true, LocalDateTime.now());
         CavaPartida r6 = new CavaPartida(null, cava3, p1, 0, 0, true, LocalDateTime.now());
         CavaPartida r7 = new CavaPartida(null, cava4, p4, 0, 0, true, LocalDateTime.now());
-        cavaPartidaRepo.saveAll(List.of(r1, r2, r3, r4, r6, r7));
+        CavaPartida r8 = new CavaPartida(null, cava5, p5, 0, 0, true, LocalDateTime.now());
+        cavaPartidaRepo.saveAll(List.of(r3, r4, r6, r7, r8));
 
         
         Categoria c1 = new Categoria(null, "Cápsulas");
@@ -188,7 +181,7 @@ public class ResetService {
         CompraMaterial compra5 = new CompraMaterial(null, 10000, 1050.0,0.105, "Albarán 5", vidal, LocalDate.of(2024, 5, 11), m5);
         CompraMaterial compra6 = new CompraMaterial(null, 10000, 750.0,0.075, "Albarán 6", vidal, LocalDate.of(2024, 5, 11), m6);
         CompraMaterial compra7 = new CompraMaterial(null, 3000, 450.0,0.15, "Albarán 7", amorin, LocalDate.of(2024, 5, 11), m7);
-        CompraMaterial compra8 = new CompraMaterial(null, 9000, 848.04,0.094, "Albarán 8", amorin, LocalDate.of(2024, 5, 11), m8);
+        CompraMaterial compra8 = new CompraMaterial(null, 9000, 848.04,0.094, "Albarán 8", sabat, LocalDate.of(2024, 5, 11), m8);
 
         cmRepo.saveAll(List.of(compra1, compra2, compra3, compra4, compra5, compra6, compra7, compra8));
         
@@ -200,7 +193,7 @@ public class ResetService {
         MovimientoMaterial mm5 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 5", 10000, m5, null, 10000, compra5);
         MovimientoMaterial mm6 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 6", 10000, m6, null, 10000, compra6);
         MovimientoMaterial mm7 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 7", 3000, m7, null, 3000, compra7);
-        MovimientoMaterial mm8 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 8", 9000, m8, null, 9000, compra7);
+        MovimientoMaterial mm8 = new MovimientoMaterial(null, LocalDate.of(2024, 5, 11), TipoMovimientoMaterial.ENTRADA, "Albarán 8", 9000, m8, null, 9000, compra8);
 
         mmRepo.saveAll(List.of(mm1, mm2, mm3, mm4, mm5, mm6, mm7, mm8));
 
@@ -232,8 +225,15 @@ public class ResetService {
         MaterialCava mc25 = new MaterialCava(null, cava4, m3);
         MaterialCava mc26 = new MaterialCava(null, cava4, m7);
         MaterialCava mc27 = new MaterialCava(null, cava4, m8);
+        MaterialCava mc28 = new MaterialCava(null, cava5, m1);
+        MaterialCava mc29 = new MaterialCava(null, cava5, m2);
+        MaterialCava mc30 = new MaterialCava(null, cava5, m3);
+        MaterialCava mc31 = new MaterialCava(null, cava5, m5);
+        MaterialCava mc32 = new MaterialCava(null, cava5, m6);
+        MaterialCava mc33 = new MaterialCava(null, cava5, m7);
+        MaterialCava mc34 = new MaterialCava(null, cava5, m8);
 
-        mcRepo.saveAll(List.of(mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc11, mc12, mc13, mc14, mc15, mc16, mc17, mc18, mc19, mc20, mc21, mc22, mc23, mc24, mc25, mc26, mc27));
+        mcRepo.saveAll(List.of(mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc11, mc12, mc13, mc14, mc15, mc16, mc17, mc18, mc19, mc20, mc21, mc22, mc23, mc24, mc25, mc26, mc27, mc28, mc29, mc30, mc31, mc32, mc33, mc34));
 
     }
 }
