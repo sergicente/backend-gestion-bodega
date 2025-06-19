@@ -179,7 +179,8 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	}
 
 	// Validar que se puede revertir sin afectar ventas
-	verificarReversionPosible(existente);
+	verificarReversionPosibleEnCavaPartidaAnterior(existente);
+	verificarReversionPosible(existente, dto.getCantidad());
 
 	// Revertir stock anterior
 	partidaAnterior.setBotellasRima(partidaAnterior.getBotellasRima() + existente.getCantidad() + existente.getMerma());
@@ -225,6 +226,36 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	existente.setCantidad(dto.getCantidad());
 	existente.setMerma(dto.getMerma());
 	existente.setLot(dto.getLot());
+
+	// Revertir materiales anteriores
+	List<MovimientoMaterial> movimientosAnteriores = mmservice.findByDeguelleId(existente.getId());
+	for (MovimientoMaterial mov : movimientosAnteriores) {
+	    Material mat = mov.getMaterial();
+	    mat.setCantidad(mat.getCantidad() + mov.getCantidad());
+	    matservice.insertar(mat);
+	    mmservice.borrar(mov.getId());
+	}
+
+	// Insertar nuevos movimientos para materiales actuales
+	List<MaterialCava> materialesActuales = mcservice.findByCavaId(dto.getCavaId());
+	List<MovimientoMaterial> nuevosMovimientos = new ArrayList<>();
+	for (MaterialCava matCava : materialesActuales) {
+	    Material material = matCava.getMaterial();
+	    int cantidadGastada = Math.round(material.getCantidadGastada() * dto.getCantidad());
+	    int nuevoStock = material.getCantidad() - cantidadGastada;
+	    material.setCantidad(nuevoStock);
+	    matservice.insertar(material);
+
+	    MovimientoMaterial nuevoMov = new MovimientoMaterial();
+	    nuevoMov.setFecha(dto.getFecha());
+	    nuevoMov.setTipo(TipoMovimientoMaterial.SALIDA);
+	    nuevoMov.setDescripcion("Actualización degüelle " + dto.getCantidad() + " botellas de " + nuevaCava.getNombre() + " (" + dto.getLot() + ")");
+	    nuevoMov.setCantidad(cantidadGastada);
+	    nuevoMov.setMaterial(material);
+	    nuevoMov.setStockResultante(nuevoStock);
+	    nuevoMov.setDeguelle(existente);
+	    mmservice.insertar(nuevoMov);
+	}
 	existente.setLimpieza(dto.isLimpieza());
 	existente.setObservaciones(dto.getObservaciones());
 	existente.setLicor(dto.getLicor());
@@ -251,7 +282,33 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	return ResponseEntity.ok(Map.of("mensaje", "Degüelle modificado correctamente"));
 
 }
-	
+
+    private void verificarReversionPosibleEnCavaPartidaAnterior(Deguelle deg) {
+        Partida partida = deg.getPartida();
+        Cava cava = deg.getCava();
+
+        Optional<CavaPartida> relacionOpt = cpservice.buscarPorCavaYPartida(cava.getId(), partida.getId());
+        if (relacionOpt.isEmpty()) {
+            throw new IllegalArgumentException("No existe relación entre la cava y la partida");
+        }
+
+        CavaPartida cp = relacionOpt.get();
+        List<Deguelle> deguellesRelacionados = dservice.buscarPorCavaYPartida(cava.getId(), partida.getId());
+
+        int totalDeguellado = deguellesRelacionados.stream()
+            .mapToInt(d -> d.getCantidad() + d.getMerma())
+            .sum();
+
+        int nuevoTotalDeguellado = totalDeguellado - deg.getCantidad() - deg.getMerma();
+
+        if (nuevoTotalDeguellado < cp.getVendido()) {
+            throw new IllegalArgumentException(
+                "No se puede cambiar el degüelle de cava: hay " + cp.getVendido() +
+                " botellas vendidas de " + cava.getNombre() + " (" + partida.getId() + "), pero quedarían solo " +
+                nuevoTotalDeguellado + " degüelladas.");
+        }
+    }
+
 	@Transactional
 	@DeleteMapping("/borrar/{id}")
 	public ResponseEntity<?> borrar(@PathVariable Long id) {
@@ -261,7 +318,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	    }
 
 	    try {
-	        verificarReversionPosible(deguelle);
+	        verificarReversionPosible(deguelle, -1);
 
 	        // 1. DESHACER DEGUELLE ANTERIOR
 	        Partida partidaAnterior = deguelle.getPartida();
@@ -312,8 +369,8 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	                .body("Error al modificar el degüellé: " + e.getMessage());
 	    }
 	}
-	
-	
+
+
 	private void verificarStockMateriales(DeguelleDto dto, int cantidadYaDescontada) {
 	    List<MaterialCava> materiales = mcservice.findByCavaId(dto.getCavaId());
 	    for (MaterialCava mat : materiales) {
@@ -326,28 +383,37 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	        }
 	    }
 	}
-	
-	private void verificarReversionPosible(Deguelle deg) {
+
+	private void verificarReversionPosible(Deguelle deg, int nuevaCantidad) {
 	    Partida partida = deg.getPartida();
 	    Cava cava = deg.getCava();
-	    int cantidadAEliminar = deg.getCantidad();
+	    int cantidadAEliminar = deg.getCantidad() + deg.getMerma();
 
 	    // Buscar relación
 	    Optional<CavaPartida> relacionOpt = cpservice.buscarPorCavaYPartida(cava.getId(), partida.getId());
-	    if (relacionOpt.isEmpty()) return;
+	    if (relacionOpt.isEmpty()) {
+	        throw new IllegalArgumentException("No existe relación entre la cava y la partida");
+	    }
 
 	    CavaPartida cp = relacionOpt.get();
 
-	    // Calcular el total de botellas degüelladas para esa combinación
+	    // Calcular el total de botellas degüelladas para esa combinación (incluyendo mermas)
 	    List<Deguelle> deguellesRelacionados = dservice.buscarPorCavaYPartida(cava.getId(), partida.getId());
 	    int totalDeguellado = deguellesRelacionados.stream()
-	        .mapToInt(Deguelle::getCantidad)
+	        .mapToInt(d -> d.getCantidad() + d.getMerma())
 	        .sum();
 
-	    int nuevoTotalDeguellado = totalDeguellado - cantidadAEliminar;
+	    int nuevoTotalDeguellado;
+	    if (nuevaCantidad == -1) {
+	        // Caso de eliminación completa
+	        nuevoTotalDeguellado = totalDeguellado - deg.getCantidad() - deg.getMerma();
+	    } else {
+	        // Caso de modificación
+	        nuevoTotalDeguellado = totalDeguellado - deg.getCantidad() - deg.getMerma() + nuevaCantidad;
+	    }
 
 	    if (nuevoTotalDeguellado < cp.getVendido()) {
-	        throw new IllegalArgumentException("No se puede eliminar este degüelle porque dejaría ventas sin cubrir");
+	        throw new IllegalArgumentException("No se puede modificar el degüelle: hay " + cp.getVendido() + " botellas vendidas, pero quedarían solo " + nuevoTotalDeguellado + " degüelladas.");
 	    }
 	}
 
