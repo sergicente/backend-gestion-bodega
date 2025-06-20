@@ -48,11 +48,13 @@ public class LogController {
         }
 
         // Convertir DTO a entidad
-        Log log = new Log(dto.getEvento());
-
+        Log log = new Log(dto.getEvento(), dto.getUsuario());
         // Guardar
         Log guardado = lservice.insertar(log);
 
+        if (guardado == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("No se ha podido guardar el log");
+        }
         // Convertir a DTO de respuesta
         LogDto nuevoDto = mapper.map(guardado, LogDto.class);
 

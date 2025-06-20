@@ -13,4 +13,5 @@ public class LogDto {
 	private Long id;
 	private LocalDateTime hora;
 	private String evento;
+	private String usuario;
 }

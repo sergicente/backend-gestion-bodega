@@ -1,9 +1,6 @@
 package cava.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,10 +13,12 @@ public class Log {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime hora;
+    @Column(columnDefinition = "TEXT")
     private String evento;
-
-    public Log(String evento) {
+    private String usuario;
+    public Log(String evento, String usuario) {
         this.hora = LocalDateTime.now();
         this.evento = evento;
+        this.usuario = usuario;
     }
 }

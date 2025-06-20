@@ -153,8 +153,16 @@ public class DeguelleController {
 	    DeguelleDto deguelleDto = new DeguelleDto();
 	    deguelleDto.setId(deguelle.getId());
 	    deguelleDto.setFecha(deguelle.getFecha());
+		deguelleDto.setLot(deguelle.getLot());
+		deguelleDto.setLotTap(deguelle.getLotTap());
 	    deguelleDto.setCantidad(deguelle.getCantidad());
+		deguelleDto.setMerma(deguelle.getMerma());
+		deguelleDto.setLimpieza(deguelle.isLimpieza());
+		deguelleDto.setObservaciones(deguelle.getObservaciones());
+		deguelleDto.setLicor(deguelle.getLicor());
 	    deguelleDto.setPartidaId(partida.getId());
+		deguelleDto.setCavaId(deguelle.getCava().getId());
+		deguelleDto.setCavaNombre(deguelle.getCava().getNombre());
 
 	    return ResponseEntity.status(HttpStatus.CREATED).body(deguelleDto);
 	}
