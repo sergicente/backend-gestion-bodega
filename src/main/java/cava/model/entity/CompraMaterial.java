@@ -1,6 +1,7 @@
 package cava.model.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,7 +35,7 @@ public class CompraMaterial {
     @JoinColumn(name = "proveedor_id", nullable = false)
     private Proveedor proveedor;
 
-    private LocalDate fecha;
+    private LocalDateTime fecha;
 
     @ManyToOne
     @JoinColumn(name = "material_id", nullable = false)

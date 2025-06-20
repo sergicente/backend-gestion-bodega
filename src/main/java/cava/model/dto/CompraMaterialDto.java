@@ -1,6 +1,7 @@
 package cava.model.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import cava.model.entity.Proveedor;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,7 @@ public class CompraMaterialDto {
     private String descripcion;
     private Long proveedorId;
     private String proveedorNombre;
-    private LocalDate fecha;
+    private LocalDateTime fecha;
     private Long materialId;
     private String materialNombre;
     private String materialCategoriaNombre;

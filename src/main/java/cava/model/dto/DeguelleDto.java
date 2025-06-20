@@ -1,6 +1,7 @@
 package cava.model.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeguelleDto {
 	private Long id;
-	private LocalDate fecha;
+	private LocalDateTime fecha;
 	private String lot;
 	private String lotTap;
 	private int cantidad;

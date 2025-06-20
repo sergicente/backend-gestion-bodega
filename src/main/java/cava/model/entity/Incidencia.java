@@ -1,6 +1,7 @@
 package cava.model.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,7 +24,7 @@ public class Incidencia {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private LocalDate fecha;
+	private LocalDateTime fecha;
 	
 	@Enumerated(EnumType.STRING)
 	TipoIncidencia tipo;
