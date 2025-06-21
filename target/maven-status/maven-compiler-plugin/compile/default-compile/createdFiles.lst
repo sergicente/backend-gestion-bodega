@@ -65,8 +65,10 @@ cava/model/entity/Usuario.class
 cava/model/repository/MaterialCavaRepository.class
 cava/model/repository/IncidenciaRepository.class
 cava/model/service/CavaPartidaServiceImpl.class
+cava/model/repository/LogRepository.class
 cava/model/entity/Proveedor.class
 cava/model/repository/UsuarioRepository.class
+cava/model/entity/Log.class
 cava/model/service/ProveedorServiceImpl.class
 cava/configuration/SeguridadConfig.class
 cava/model/repository/CompraMaterialRepository.class
@@ -87,8 +89,11 @@ cava/model/restcontroller/VentaController.class
 cava/model/restcontroller/MaterialCavaController.class
 cava/model/restcontroller/CosteCrianzaController.class
 cava/model/entity/Categoria.class
+cava/model/service/LogService.class
 cava/model/service/CosteFijoBotellaService.class
 cava/model/restcontroller/CompraMaterialController.class
+cava/model/dto/LogDto.class
+cava/model/service/LogServiceImpl.class
 cava/model/dto/MaterialDto.class
 cava/model/entity/Cava.class
 cava/model/service/FamiliaServiceImpl.class
@@ -97,6 +102,7 @@ cava/MonastellApplication.class
 cava/model/entity/Deguelle.class
 cava/model/service/DeguelleServiceImpl.class
 cava/model/repository/FamiliaRepository.class
+cava/model/restcontroller/LogController.class
 cava/model/dto/CavaDto.class
 cava/model/service/MovimientoMaterialServiceImpl.class
 cava/model/entity/Familia.class

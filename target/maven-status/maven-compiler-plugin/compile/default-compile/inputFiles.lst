@@ -11,6 +11,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/DeguelleDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/FamiliaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/IncidenciaDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LogDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LoginRequest.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LoginResponse.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/MaterialCavaDto.java
@@ -29,6 +30,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Deguelle.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Familia.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Incidencia.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Log.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Material.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/MaterialCava.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/MovimientoMaterial.java
@@ -50,6 +52,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/DeguelleRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/FamiliaRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/IncidenciaRepository.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/LogRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/MaterialCavaRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/MaterialRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/MovimientoMaterialRepository.java
@@ -68,6 +71,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/DevToolsController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/FamiliaController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/IncidenciaController.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/LogController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/MaterialCavaController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/MaterialController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/MovimientoMaterialController.java
@@ -93,6 +97,8 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/IncidenciaService.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/IncidenciaServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/InterfaceGenericoCrud.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/LogService.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/LogServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/MaterialCavaService.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/MaterialCavaServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/MaterialService.java

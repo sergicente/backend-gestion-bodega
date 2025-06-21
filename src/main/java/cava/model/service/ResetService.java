@@ -123,8 +123,8 @@ public class ResetService {
         Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
         Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
         Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, false, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
-        Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", "", "2", null, 2.10);
-        Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", "", "", null, 2.20);
+        Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.10);
+        Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.20);
 
         partidaRepo.saveAll(List.of(p1, p2, p3, p4, p5, p6));
      
