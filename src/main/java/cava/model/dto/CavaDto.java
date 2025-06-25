@@ -14,6 +14,7 @@ public class CavaDto {
     private String id;
     private String nombre;
     private String familiaId;
+    private String familiaNombre;
     private boolean ecologico;
     private PartidaDto partidaActual;
     private List<CavaPartidaDto> partidasRelacionadas;

@@ -2,6 +2,7 @@ package cava.model.service;
 
 import java.util.List;
 
+import cava.model.entity.Material;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +68,11 @@ public class CompraMaterialServiceImpl implements CompraMaterialService{
 	@Override
 	public List<CompraMaterial> findByProveedorId(Long id) {
 		return cmrepo.findByProveedorId(id);
+	}
+
+	@Override
+	public List<Material> obtenerMaterialesPorProveedor(Long proveedorId) {
+		return cmrepo.findMaterialesByProveedorId(proveedorId);
 	}
 
 }

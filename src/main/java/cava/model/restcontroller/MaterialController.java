@@ -3,6 +3,7 @@ package cava.model.restcontroller;
 import java.util.ArrayList;
 import java.util.List;
 
+import cava.model.service.CompraMaterialService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -39,6 +40,8 @@ public class MaterialController {
 	private CategoriaService catservice;
 	@Autowired
 	private ModelMapper mapper;
+    @Autowired
+    private CompraMaterialService cmservice;
 
 
     // Obtener todas las partidas
@@ -54,8 +57,15 @@ public class MaterialController {
 
 	    return ResponseEntity.ok(dtos);
 	}
-    
-    
+
+    @GetMapping("/proveedor/{id}")
+    public ResponseEntity<List<MaterialDto>> obtenerMaterialesPorProveedor(@PathVariable Long id) {
+        List<Material> materiales = cmservice.obtenerMaterialesPorProveedor(id);
+        List<MaterialDto> dtos = materiales.stream()
+                .map(material -> mapper.map(material, MaterialDto.class))
+                .toList();
+        return ResponseEntity.ok(dtos);
+    }
     
 	@GetMapping("/{id}")
 	public ResponseEntity<?> obtenerUno(@PathVariable long id) {

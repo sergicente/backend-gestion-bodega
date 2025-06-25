@@ -13,6 +13,7 @@ public class CavaPartidaDto {
 	private Long id;
     private String cavaId;
     private String cavaNombre;
+    private String cavaFamiliaNombre;
     private String partidaId;
     private boolean actual;
     private boolean partidaEcologico;

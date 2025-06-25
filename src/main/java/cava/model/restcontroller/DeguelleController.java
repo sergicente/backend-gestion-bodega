@@ -172,7 +172,7 @@ public class DeguelleController {
 	    deguelleDto.setPartidaId(partida.getId());
 		deguelleDto.setCavaId(deguelle.getCava().getId());
 		deguelleDto.setCavaNombre(deguelle.getCava().getNombre());
-
+		deguelleDto.setCavaFamiliaNombre(deguelle.getCava().getFamilia().getNombre());
 	    return ResponseEntity.status(HttpStatus.CREATED).body(deguelleDto);
 	}
 
@@ -190,7 +190,8 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El lote no puede estar vacío");
 	}
 
-	if (dservice.existsByLotIgnoreCase(dto.getLot())) {
+	Deguelle otro = dservice.findByLotIgnoreCase(dto.getLot());
+	if (otro != null && !otro.getId().equals(id)) {
 		return ResponseEntity.status(HttpStatus.CONFLICT).body("Aquest lot ja existeix");
 	}
 

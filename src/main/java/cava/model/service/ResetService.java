@@ -146,8 +146,7 @@ public class ResetService {
         
         Familia f1 = new Familia(1L, "Montsant");
         Familia f2 = new Familia(2L, "Mas Xarot");
-        Familia f3 = new Familia(3L, "Roca Gibert");
-        fRepo.saveAll(List.of(f1, f2, f3));
+        fRepo.saveAll(List.of(f1, f2));
         
         
         Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, true, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
@@ -160,19 +159,22 @@ public class ResetService {
         partidaRepo.saveAll(List.of(p1, p2, p3, p4, p5, p6));
      
     
-        Cava cava1 = new Cava("21", "Mas Xarot Brut", true, f2, null, null);
-        Cava cava2 = new Cava("23", "Mas Xarot Brut Nature", true, f2, null, null);
-        Cava cava3 = new Cava("25", "Mas Xarot Enoteca", true, f2, null, null);
-        Cava cava4 = new Cava("22", "Mas Xarot Barcelona", false, f2, null, null);
-       Cava cava5 = new Cava("24", "Mas Xarot Pinot Noir", true, f2, null, null);
-        cavaRepo.saveAll(List.of(cava1, cava2, cava3, cava4, cava5));
-        
+        Cava cava1 = new Cava("21", "Brut", true, f2, null, null);
+        Cava cava2 = new Cava("23", "Brut Nature", true, f2, null, null);
+        Cava cava3 = new Cava("25", "Enoteca", true, f2, null, null);
+        Cava cava4 = new Cava("22", "Barcelona", false, f2, null, null);
+        Cava cava5 = new Cava("24", "Pinot Noir", true, f2, null, null);
+        Cava cava6 = new Cava("11", "Artesà", false, f1, null, null);
+
+        cavaRepo.saveAll(List.of(cava1, cava2, cava3, cava4, cava5, cava6));
+
+        CavaPartida r2 = new CavaPartida(null, cava6, p4, 0, 0, true, LocalDateTime.now());
         CavaPartida r3 = new CavaPartida(null, cava1, p3, 0, 0, true, LocalDateTime.now());
         CavaPartida r4 = new CavaPartida(null, cava2, p2, 0, 0, true, LocalDateTime.now());
         CavaPartida r6 = new CavaPartida(null, cava3, p1, 0, 0, true, LocalDateTime.now());
         CavaPartida r7 = new CavaPartida(null, cava4, p4, 0, 0, true, LocalDateTime.now());
         CavaPartida r8 = new CavaPartida(null, cava5, p5, 0, 0, true, LocalDateTime.now());
-        cavaPartidaRepo.saveAll(List.of(r3, r4, r6, r7, r8));
+        cavaPartidaRepo.saveAll(List.of(r2, r3, r4, r6, r7, r8));
 
         
         Categoria c1 = new Categoria(null, "Càpsules");

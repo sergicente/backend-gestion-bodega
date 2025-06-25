@@ -59,5 +59,10 @@ public class DeguelleServiceImpl implements DeguelleService{
 		return movbotrepo.existsByLotIgnoreCase(lot.trim());
 	}
 
+	@Override
+	public Deguelle findByLotIgnoreCase(String lot) {
+		return movbotrepo.findByLotIgnoreCase(lot);
+	}
+
 
 }

@@ -13,6 +13,7 @@ public class MaterialCavaDto {
     private String materialNombre;
     private float materialPrecioActual;
     private int cantidad;
+    private int materialCantidadMinima;
     private String categoriaNombre;
     private int cantidadGastada;
     private String cavaNombre;
