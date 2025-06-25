@@ -4,22 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import cava.model.entity.*;
 import cava.model.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import cava.model.entity.Categoria;
-import cava.model.entity.Cava;
-import cava.model.entity.CavaPartida;
-import cava.model.entity.CompraMaterial;
-import cava.model.entity.Familia;
-import cava.model.entity.Material;
-import cava.model.entity.MaterialCava;
-import cava.model.entity.MovimientoMaterial;
-import cava.model.entity.Partida;
-import cava.model.entity.Proveedor;
-import cava.model.entity.TipoMovimientoMaterial;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -68,9 +58,24 @@ public class ResetService {
     @Autowired
     private LogRepository lRepo;
 
+    @Autowired
+    private UsuarioRepository uRepo;
+
+    @Autowired
+    private CosteCrianzaRepository ccRepo;
+
+    @Autowired
+    private CosteFijoBotellaRepository cfRepo;
+
     @Transactional
     public void reiniciarBaseDeDatos() {
 
+        // Coste Fijo
+//        cfRepo.deleteAll();
+//        // Coste Crianza
+//        ccRepo.deleteAll();
+
+        //  Log
         lRepo.deleteAll();
     	
     	// Roturas
@@ -111,7 +116,33 @@ public class ResetService {
 
         // Familias
         fRepo.deleteAll();
-        
+
+
+
+        cfRepo.findById(1L).ifPresentOrElse(
+                existente -> {
+                    existente.setCosteFijoBotella(2.22);
+                    cfRepo.save(existente);
+                },
+                () -> {
+                    CosteFijoBotella nuevo = new CosteFijoBotella(1L, 2.22);
+                    cfRepo.save(nuevo);
+                }
+        );
+
+        ccRepo.findById(1L).ifPresentOrElse(
+                existente -> {
+                    existente.setCosteCrianzaBotella(0.1);
+                    ccRepo.save(existente);
+                },
+                () -> {
+                    CosteCrianza nuevo = new CosteCrianza(1L, 0.1);
+                    ccRepo.save(nuevo);
+                }
+        );
+
+        Usuario admin = new Usuario(1L, "Admin", "admin", "admin", Rol.ADMIN);
+        uRepo.save(admin);
         
         Familia f1 = new Familia(1L, "Montsant");
         Familia f2 = new Familia(2L, "Mas Xarot");
@@ -144,11 +175,11 @@ public class ResetService {
         cavaPartidaRepo.saveAll(List.of(r3, r4, r6, r7, r8));
 
         
-        Categoria c1 = new Categoria(null, "Cápsulas");
-        Categoria c2 = new Categoria(null, "Etiquetas");
-        Categoria c3 = new Categoria(null, "Cajas");
-        Categoria c4 = new Categoria(null, "Collarínes");
-        Categoria c5 = new Categoria(null, "Contraetiquetas");
+        Categoria c1 = new Categoria(null, "Càpsules");
+        Categoria c2 = new Categoria(null, "Etiquetes");
+        Categoria c3 = new Categoria(null, "Caixes");
+        Categoria c4 = new Categoria(null, "Collarins");
+        Categoria c5 = new Categoria(null, "Contraetiquetes");
         Categoria c6 = new Categoria(null, "Taps");
         Categoria c7 = new Categoria(null,"Morrions");
         catRepo.saveAll(List.of(c1, c2, c3, c4, c5,c6, c7));
@@ -162,26 +193,26 @@ public class ResetService {
         
         
         
-        Material m1 = new Material(null, "Cápsula Mas Xarot", (float)(1605.0 / 30000), c1, f2, null, 30000, 1000, 1f);
-        Material m2 = new Material(null, "Etiqueta Mas Xarot", (float)(1520.0 / 10000), c2, f2, null, 10000, 1000, 1f);
-        Material m3 = new Material(null, "Caja Mas Xarot", (float)(830.0 / 1000), c3, f2, null, 1000, 200, 0.17f);
-        Material m4 = new Material(null, "Caja Montsant", (float)(810.0 / 1000), c3, f1, null, 1000, 200, 0.17f);
-        Material m5 = new Material(null, "Collarín Mas Xarot", (float)(105.0 / 1000), c4, f2, null, 10000, 1000, 1f);
-        Material m6 = new Material(null, "Contraetiqueta Mas Xarot", (float)(75.0 / 1000), c5, f2, null, 10000, 1000, 1f);
+        Material m1 = new Material(null, "Càpsula", (float)(1605.0 / 30000), c1, f2, null, 30000, 1000, 1f);
+        Material m2 = new Material(null, "Etiqueta", (float)(1520.0 / 10000), c2, f2, null, 10000, 1000, 1f);
+        Material m3 = new Material(null, "Caixa", (float)(830.0 / 1000), c3, f2, null, 1000, 200, 0.17f);
+        Material m4 = new Material(null, "Caixa Montsant", (float)(810.0 / 1000), c3, f1, null, 1000, 200, 0.17f);
+        Material m5 = new Material(null, "Collarí", (float)(105.0 / 1000), c4, f2, null, 10000, 1000, 1f);
+        Material m6 = new Material(null, "Contraetiqueta", (float)(75.0 / 1000), c5, f2, null, 10000, 1000, 1f);
         Material m7 = new Material(null, "Tap Suro", (float)(450.0 / 3000), c6, f2, null, 3000, 500, 1f);
-        Material m8 = new Material(null, "Morrió Mas Xarot", (float)(848.04 / 9000), c7, f2, null, 9000, 1000, 1f);
+        Material m8 = new Material(null, "Morrió", (float)(848.04 / 9000), c7, f2, null, 9000, 1000, 1f);
 
         matRepo.saveAll(List.of(m1, m2, m3, m4, m5, m6, m7, m8));
 
         
-        CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0,0.05, "Albarán 1", enoplastic, LocalDateTime.of(2023, 3, 5,10,0), m1);
-        CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0,0.15, "Albarán 2", vidal, LocalDateTime.of(2024, 5, 11,10,0), m2);
-        CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0,0.83, "Albarán 3", cartonajes, LocalDateTime.of(2025, 4, 3,10,0), m3);
-        CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0,0.81, "Albarán 4", cartonajes, LocalDateTime.of(2025, 7, 6,10,0), m4);
-        CompraMaterial compra5 = new CompraMaterial(null, 10000, 1050.0,0.105, "Albarán 5", vidal, LocalDateTime.of(2024, 5, 11,10,0), m5);
-        CompraMaterial compra6 = new CompraMaterial(null, 10000, 750.0,0.075, "Albarán 6", vidal, LocalDateTime.of(2024, 5, 11,10,0), m6);
-        CompraMaterial compra7 = new CompraMaterial(null, 3000, 450.0,0.15, "Albarán 7", amorin, LocalDateTime.of(2024, 5, 11,10,0), m7);
-        CompraMaterial compra8 = new CompraMaterial(null, 9000, 848.04,0.094, "Albarán 8", sabat, LocalDateTime.of(2024, 5, 11,10,0), m8);
+        CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0,0.05, "Albarà 1", enoplastic, LocalDateTime.of(2023, 3, 5,10,0), m1);
+        CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0,0.15, "Albarà 2", vidal, LocalDateTime.of(2024, 5, 11,10,0), m2);
+        CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0,0.83, "Albarà 3", cartonajes, LocalDateTime.of(2025, 4, 3,10,0), m3);
+        CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0,0.81, "Albarà 4", cartonajes, LocalDateTime.of(2025, 7, 6,10,0), m4);
+        CompraMaterial compra5 = new CompraMaterial(null, 10000, 1050.0,0.105, "Albarà 5", vidal, LocalDateTime.of(2024, 5, 11,10,0), m5);
+        CompraMaterial compra6 = new CompraMaterial(null, 10000, 750.0,0.075, "Albarà 6", vidal, LocalDateTime.of(2024, 5, 11,10,0), m6);
+        CompraMaterial compra7 = new CompraMaterial(null, 3000, 450.0,0.15, "Albarà 7", amorin, LocalDateTime.of(2024, 5, 11,10,0), m7);
+        CompraMaterial compra8 = new CompraMaterial(null, 9000, 848.04,0.094, "Albarà 8", sabat, LocalDateTime.of(2024, 5, 11,10,0), m8);
 
         cmRepo.saveAll(List.of(compra1, compra2, compra3, compra4, compra5, compra6, compra7, compra8));
         

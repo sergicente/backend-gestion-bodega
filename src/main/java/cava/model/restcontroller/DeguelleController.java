@@ -87,6 +87,15 @@ public class DeguelleController {
 	        throw new IllegalArgumentException("No hay suficientes botellas en rima");
 	    }
 
+		// Validación del lote
+		if (dto.getLot() == null || dto.getLot().trim().isEmpty()) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El lote no puede estar vacío");
+		}
+
+		if (dservice.existsByLotIgnoreCase(dto.getLot())) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("Aquest lot ja existeix");
+		}
+
 	    partida.setBotellasRima(nuevaCantidadRima);
 	    partida.setBotellasStock(partida.getBotellasStock() + dto.getCantidad());
 	    partida.setBotellasMerma(partida.getBotellasMerma()+ dto.getMerma());
@@ -174,6 +183,15 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	Deguelle existente = dservice.buscar(id);
 	if (existente == null) {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüelle no encontrado");
+	}
+
+	// Validación del lote
+	if (dto.getLot() == null || dto.getLot().trim().isEmpty()) {
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El lote no puede estar vacío");
+	}
+
+	if (dservice.existsByLotIgnoreCase(dto.getLot())) {
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Aquest lot ja existeix");
 	}
 
 	Partida partidaAnterior = existente.getPartida();

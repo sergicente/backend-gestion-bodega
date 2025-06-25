@@ -157,9 +157,13 @@ public class CavaPartidaController {
 	
     @DeleteMapping("/borrar/{id}")
     public ResponseEntity<?> borrar(@PathVariable Long id) {
-    	CavaPartida existente = cpservice.buscar(id);
+        CavaPartida existente = cpservice.buscar(id);
         if (existente == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra la relación con id " + id);
+        }
+        // Verificar que vendido y cantidad sean ambos igual a 0 antes de borrar
+        if (existente.getVendido() > 0 || existente.getCantidad() > 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Aquesta relació ja conté dades guardades");
         }
         cpservice.borrar(id);
         return ResponseEntity.noContent().build();

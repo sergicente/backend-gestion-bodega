@@ -54,6 +54,10 @@ public class DeguelleServiceImpl implements DeguelleService{
 	    return movbotrepo.findByCavaIdAndPartidaId(cavaId, partidaId);
 	}
 
+	@Override
+	public boolean existsByLotIgnoreCase(String lot) {
+		return movbotrepo.existsByLotIgnoreCase(lot.trim());
+	}
 
 
 }
