@@ -1,5 +1,7 @@
 package cava.model.repository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,4 +14,6 @@ public interface DeguelleRepository extends JpaRepository<Deguelle, Long>{
 	List<Deguelle> findByCavaIdAndPartidaId(String cavaId, String partidaId);
 	boolean existsByLotIgnoreCase(String lot);
 	Deguelle findByLotIgnoreCase(String lot);
+	List<Deguelle> findByFechaBetween(LocalDateTime desde, LocalDateTime hasta);
+
 }

@@ -116,7 +116,7 @@ public class DeguelleController {
 	        MovimientoMaterial mov = new MovimientoMaterial();
 	        mov.setFecha(dto.getFecha());
 	        mov.setTipo(TipoMovimientoMaterial.SALIDA);
-	        mov.setDescripcion("Degüelle " + dto.getCantidad() + " botellas de " + cava.getNombre() + " (" + dto.getLot() + ")");
+	        mov.setDescripcion("Desgorg " + dto.getCantidad() + " ampolles de " + cava.getNombre() + " (" + dto.getLot() + ")");
 	        mov.setCantidad(cantidadARestar);
 	        mov.setMaterial(material);
 	        mov.setStockResultante(nuevoStock);
@@ -148,7 +148,7 @@ public class DeguelleController {
 			merma.setPartida(partida);
 			merma.setTipo(TipoIncidencia.DEGÜELLE);
 			merma.setFecha(dto.getFecha());
-			merma.setDetalles("Merma del deguelle " + dto.getLot());
+			merma.setDetalles("Merma del desgorg " + dto.getLot());
 			merma.setDeguelle(deguelle);
 			iservice.insertar(merma);
 		}
@@ -231,7 +231,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	}
 
 	// Validar que hay materiales suficientes, compensando los ya descontados
-	verificarStockMateriales(dto, existente.getCantidad());
+//	verificarStockMateriales(dto, existente.getCantidad());
 
 	// Aplicar nuevos cambios
 	nuevaPartida.setBotellasRima(rimaDisponible - totalNecesario);
@@ -276,7 +276,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	    MovimientoMaterial nuevoMov = new MovimientoMaterial();
 	    nuevoMov.setFecha(dto.getFecha());
 	    nuevoMov.setTipo(TipoMovimientoMaterial.SALIDA);
-	    nuevoMov.setDescripcion("Actualización degüelle " + dto.getCantidad() + " botellas de " + nuevaCava.getNombre() + " (" + dto.getLot() + ")");
+	    nuevoMov.setDescripcion("Actualització desgorg " + dto.getCantidad() + " ampolles de " + nuevaCava.getNombre() + " (" + dto.getLot() + ")");
 	    nuevoMov.setCantidad(cantidadGastada);
 	    nuevoMov.setMaterial(material);
 	    nuevoMov.setStockResultante(nuevoStock);
@@ -298,7 +298,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 		}
 		incidencia.setCantidad(dto.getMerma());
 		incidencia.setFecha(dto.getFecha());
-		incidencia.setDetalles("Merma del degüelle " + dto.getLot());
+		incidencia.setDetalles("Merma del desgorg " + dto.getLot());
 		incidencia.setPartida(nuevaPartida);
 		incidencia.setCava(nuevaCava);
 		iservice.insertar(incidencia);

@@ -149,12 +149,12 @@ public class ResetService {
         fRepo.saveAll(List.of(f1, f2));
         
         
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 1000, 0, 0, 0, true, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
-        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
-        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
-        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 1000, 0, 0, 0, false, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
-        Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.10);
-        Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 1000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.20);
+        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 10000, 0, 0, 0, true, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
+        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
+        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
+        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 10000, 0, 0, 0, false, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
+        Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.10);
+        Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.20);
 
         partidaRepo.saveAll(List.of(p1, p2, p3, p4, p5, p6));
      
@@ -195,7 +195,7 @@ public class ResetService {
         
         
         
-        Material m1 = new Material(null, "Càpsula", (float)(1605.0 / 30000), c1, f2, null, 30000, 1000, 1f);
+        Material m1 = new Material(null, "Càpsula", (float)(321.0 / 5000), c1, f2, null, 5000, 3000, 1f);
         Material m2 = new Material(null, "Etiqueta", (float)(1520.0 / 10000), c2, f2, null, 10000, 1000, 1f);
         Material m3 = new Material(null, "Caixa", (float)(830.0 / 1000), c3, f2, null, 1000, 200, 0.17f);
         Material m4 = new Material(null, "Caixa Montsant", (float)(810.0 / 1000), c3, f1, null, 1000, 200, 0.17f);
@@ -207,7 +207,7 @@ public class ResetService {
         matRepo.saveAll(List.of(m1, m2, m3, m4, m5, m6, m7, m8));
 
         
-        CompraMaterial compra1 = new CompraMaterial(null, 30000, 1605.0,0.05, "Albarà 1", enoplastic, LocalDateTime.of(2023, 3, 5,10,0), m1);
+        CompraMaterial compra1 = new CompraMaterial(null, 5000, 321.0,0.05, "Albarà 1", enoplastic, LocalDateTime.of(2023, 3, 5,10,0), m1);
         CompraMaterial compra2 = new CompraMaterial(null, 10000, 1520.0,0.15, "Albarà 2", vidal, LocalDateTime.of(2024, 5, 11,10,0), m2);
         CompraMaterial compra3 = new CompraMaterial(null, 1000, 830.0,0.83, "Albarà 3", cartonajes, LocalDateTime.of(2025, 4, 3,10,0), m3);
         CompraMaterial compra4 = new CompraMaterial(null, 1000, 1520.0,0.81, "Albarà 4", cartonajes, LocalDateTime.of(2025, 7, 6,10,0), m4);
@@ -219,7 +219,7 @@ public class ResetService {
         cmRepo.saveAll(List.of(compra1, compra2, compra3, compra4, compra5, compra6, compra7, compra8));
         
         
-        MovimientoMaterial mm1 = new MovimientoMaterial(null, LocalDateTime.of(2023, 3, 5,10,0), TipoMovimientoMaterial.ENTRADA, "Albarán 1", 30000, m1, null, 30000, compra1);
+        MovimientoMaterial mm1 = new MovimientoMaterial(null, LocalDateTime.of(2023, 3, 5,10,0), TipoMovimientoMaterial.ENTRADA, "Albarán 1", 5000, m1, null, 5000, compra1);
         MovimientoMaterial mm2 = new MovimientoMaterial(null, LocalDateTime.of(2024, 5, 11,10,0), TipoMovimientoMaterial.ENTRADA, "Albarán 2", 10000, m2, null, 10000, compra2);
         MovimientoMaterial mm3 = new MovimientoMaterial(null, LocalDateTime.of(2025, 4, 3,10,0), TipoMovimientoMaterial.ENTRADA, "Albarán 3", 1000, m3, null, 1000, compra3);
         MovimientoMaterial mm4 = new MovimientoMaterial(null, LocalDateTime.of(2025, 7, 6,10,0), TipoMovimientoMaterial.ENTRADA, "Albarán 4", 1000, m4, null, 1000, compra4);
@@ -267,6 +267,13 @@ public class ResetService {
         MaterialCava mc34 = new MaterialCava(null, cava5, m8);
 
         mcRepo.saveAll(List.of(mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc11, mc12, mc13, mc14, mc15, mc16, mc17, mc18, mc19, mc20, mc21, mc22, mc23, mc24, mc25, mc26, mc27, mc28, mc29, mc30, mc31, mc32, mc33, mc34));
+
+
+
+
+
+
+
 
     }
 }
