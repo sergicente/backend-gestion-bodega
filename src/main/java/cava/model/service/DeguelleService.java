@@ -3,6 +3,7 @@ package cava.model.service;
 import java.util.List;
 import java.util.Optional;
 
+import cava.model.dto.DashboardResumenDto;
 import cava.model.entity.CavaPartida;
 import cava.model.entity.Deguelle;
 

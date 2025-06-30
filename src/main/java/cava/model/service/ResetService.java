@@ -149,14 +149,15 @@ public class ResetService {
         fRepo.saveAll(List.of(f1, f2));
         
         
-        Partida p1 = new Partida("18PINSURO", LocalDate.of(2019, 2, 10), 10000, 0, 0, 0, true, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
-        Partida p2 = new Partida("20PIN", LocalDate.of(2021, 1, 5), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
-        Partida p3 = new Partida("21PIN", LocalDate.of(2022, 2, 18), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
-        Partida p4 = new Partida("22SJ", LocalDate.of(2023, 1, 15), 10000, 0, 0, 0, false, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
-        Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.10);
-        Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 10000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.20);
+        Partida p1 = new Partida("19PINSURO", LocalDate.of(2020, 2, 10), 120530, 0, 0, 0, true, "Verda", "Suro", "Celler Piñol", "50% Xarel·lo", "25% Macabeu", "25% Parellada", null, 2.44);
+        Partida p2 = new Partida("21PIN", LocalDate.of(2022, 1, 5), 112350, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "40% Xarel·lo", " 30% Macabeu", "30% Parellada", null, 2.01);
+        Partida p3 = new Partida("22PIN", LocalDate.of(2023, 2, 18), 105400, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
+        Partida p4 = new Partida("23SJ", LocalDate.of(2024, 1, 15), 100500, 0, 0, 0, false, "Verda", "Corona", "Cellers Domenys", "35% Xarel·lo", "35% Macabeu", "30% Parellada", null, 1.92);
+        Partida p5 = new Partida("23ROSAT", LocalDate.of(2024, 2, 5), 13000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.10);
+        Partida p6 = new Partida("21ROSATGR", LocalDate.of(2022, 2, 14), 14000, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "100% Pinot Noir", null, null, null, 2.20);
+        Partida p7 = new Partida("24PIN", LocalDate.of(2025, 2, 18), 123400, 0, 0, 0, true, "Verda", "Corona", "Celler Piñol", "55% Xarel·lo", "25% Macabeu", "20% Parellada", null, 2.01);
 
-        partidaRepo.saveAll(List.of(p1, p2, p3, p4, p5, p6));
+        partidaRepo.saveAll(List.of(p1, p2, p3, p4, p5, p6, p7));
      
     
         Cava cava1 = new Cava("21", "Brut", true, f2, null, null);

@@ -1,12 +1,12 @@
 package cava.model.service;
 
+import cava.model.dto.DashboardGraficoCavasDto;
 import cava.model.dto.DashboardResumenDto;
 import cava.model.dto.ResumenDeguellesDto;
 import cava.model.entity.Deguelle;
 import cava.model.entity.Partida;
 import cava.model.repository.DeguelleRepository;
 import cava.model.repository.PartidaRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.TreeMap;
@@ -16,7 +16,6 @@ import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class DashboardServiceImpl implements DashboardService{
@@ -155,4 +154,12 @@ public class DashboardServiceImpl implements DashboardService{
 		}
 		return total;
 	}
+
+
+	@Override
+	public List<DashboardGraficoCavasDto> obtenerDeguelladosPorCavaEsteAnyo() {
+		int anyoActual = LocalDate.now().getYear();
+		return dRepo.obtenerDeguelladosPorCavaEsteAnyo(anyoActual);
+	}
+
 }

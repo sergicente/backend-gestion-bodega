@@ -2,6 +2,8 @@ package cava.configuration;
 import cava.model.entity.Usuario;
 import cava.model.repository.UsuarioRepository;
 import java.io.IOException;
+
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,22 +35,37 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String jwt = authHeader.substring(7);
-            String email = jwtUtil.extractEmail(jwt); // subjet
+            try {
+                String email = jwtUtil.extractEmail(jwt); // subjet
 
-            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
 
-                if (usuario != null && jwtUtil.isTokenValid(jwt)) {
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(
-                                    usuario, null, usuario.getAuthorities());
+                    if (usuario != null && jwtUtil.isTokenValid(jwt)) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        usuario, null, usuario.getAuthorities());
 
-                    authToken.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
+                        );
 
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
+
+            } catch (ExpiredJwtException ex) {
+                // Token expirado: respondemos con 401 y mensaje JSON
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Token expired\"}");
+                return; // no seguir con la cadena de filtros
+            } catch (Exception ex) {
+                // Otro error con el token: respondemos con 401 también
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\": \"Invalid token\"}");
+                return;
             }
         }
 

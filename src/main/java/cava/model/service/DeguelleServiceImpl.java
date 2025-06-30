@@ -1,8 +1,10 @@
 package cava.model.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import cava.model.dto.DashboardResumenDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +65,7 @@ public class DeguelleServiceImpl implements DeguelleService{
 	public Deguelle findByLotIgnoreCase(String lot) {
 		return movbotrepo.findByLotIgnoreCase(lot);
 	}
+
 
 
 }

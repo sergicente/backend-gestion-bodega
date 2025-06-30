@@ -341,7 +341,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	public ResponseEntity<?> borrar(@PathVariable Long id) {
 	    Deguelle deguelle = dservice.buscar(id);
 	    if (deguelle == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Degüellé no encontrado");
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No s'ha trobat el desgorg");
 	    }
 
 	    try {
@@ -390,10 +390,10 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 
 	    } catch (IllegalArgumentException e) {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-	                .body("No se puede deshacer el degüellé: " + e.getMessage());
+	                .body("No es pot modificar el desgorg: " + e.getMessage());
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-	                .body("Error al modificar el degüellé: " + e.getMessage());
+	                .body("No es pot modificar el desgorg: " + e.getMessage());
 	    }
 	}
 
@@ -440,7 +440,7 @@ public ResponseEntity<?> modificar(@PathVariable Long id, @RequestBody DeguelleD
 	    }
 
 	    if (nuevoTotalDeguellado < cp.getVendido()) {
-	        throw new IllegalArgumentException("No se puede modificar el degüelle: hay " + cp.getVendido() + " botellas vendidas, pero quedarían solo " + nuevoTotalDeguellado + " degüelladas.");
+	        throw new IllegalArgumentException("Hi ha " + cp.getVendido() + " ampolles venudes, però quedarien sols " + nuevoTotalDeguellado + " desgorjades.");
 	    }
 	}
 

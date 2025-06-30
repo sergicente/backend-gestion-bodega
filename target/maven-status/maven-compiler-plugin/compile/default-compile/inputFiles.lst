@@ -8,6 +8,8 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/CavaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/CavaPartidaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/CompraMaterialDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/DashboardGraficoCavasDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/DashboardResumenDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/DeguelleDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/FamiliaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/IncidenciaDto.java
@@ -19,6 +21,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/MovimientoMaterialDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/PartidaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ProveedorDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ResumenDeguellesDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/VentaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/VentaRequestDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Categoria.java
@@ -67,6 +70,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/CompraMaterialController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/CosteCrianzaController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/CosteFijoBotellaController.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/DashboardController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/DeguelleController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/DevToolsController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/FamiliaController.java
@@ -90,6 +94,8 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/CosteCrianzaServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/CosteFijoBotellaService.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/CosteFijoBotellaServiceImpl.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/DashboardService.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/DashboardServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/DeguelleService.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/DeguelleServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/FamiliaService.java

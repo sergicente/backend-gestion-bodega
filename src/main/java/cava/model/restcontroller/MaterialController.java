@@ -171,7 +171,7 @@ public class MaterialController {
         List<Material> todos = mservice.buscarTodos();
         List<MaterialDto> alertas = new ArrayList<>();
         for (Material m : todos) {
-            if (m.getCantidad() <= m.getCantidadMinima()) {
+            if (m.getCantidad() <= m.getCantidadMinima()*2) {
                 MaterialDto dto = mapper.map(m, MaterialDto.class);
                 alertas.add(dto);
             }
