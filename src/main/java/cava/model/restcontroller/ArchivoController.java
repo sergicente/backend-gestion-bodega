@@ -84,6 +84,30 @@ public class ArchivoController {
         }
     }
 
+    @DeleteMapping("/{tipo}/{id}/{nombreArchivo}")
+    public ResponseEntity<Void> eliminarArchivo(@PathVariable String tipo,
+                                                @PathVariable String id,
+                                                @PathVariable String nombreArchivo) {
+        try {
+            Path archivoPath = Paths.get(rutaBaseArchivos, tipo, id, nombreArchivo).normalize();
+
+            if (!archivoPath.startsWith(Paths.get(rutaBaseArchivos))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            if (!Files.exists(archivoPath) || !Files.isReadable(archivoPath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Files.delete(archivoPath);
+
+            return ResponseEntity.noContent().build();
+
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @PostMapping("/{tipo}/{id}")
     public ResponseEntity<Map<String, String>> subirArchivos(@PathVariable String tipo,
             @PathVariable String id,

@@ -4,6 +4,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/configuration/JwtUtil.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/configuration/ModelMapperConfig.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/configuration/SeguridadConfig.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ArchivoDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/CategoriaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/CavaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/CavaPartidaDto.java
@@ -63,6 +64,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/ProveedorRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/UsuarioRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/VentaRepository.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/ArchivoController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/AuthController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/CategoriaController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/CavaController.java

@@ -1,0 +1,20 @@
+Poder añadir pdfs de cada partida (documentos)
+habilitar exportar excels
+ASIGNACIO DE CODIFICACIONS RME EN EL DESGORG (RELACIO PARTIDA-CAVA)
+
+hecho:
+data automatica a afegir compra
+AFEGIR LOTS DE TAPS EN EL DESGORG
+importante que no bloquee un deguelle (al ferran)
+afegir mermes de criança.
+Coste de botella y materiales (se actualizan al hacer una entrada)
+dosage azucar en deguelle
+observaciones en deguelle
+tic de limpieza en deguelle
+mermas en deguelle
+habilitar buscadores en materiales
+eco en rimas y cavas
+añadir parametros tipo botella, corcho, eco (en la tabla), proveedor...
+tabla: botellas en rima, tapon, botella, proveedor, eco
+entrar las ventas mensuales que resten el inventario de botellas actual
+desbloquear partida en deguelle

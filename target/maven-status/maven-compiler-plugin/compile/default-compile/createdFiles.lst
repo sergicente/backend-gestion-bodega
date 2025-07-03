@@ -3,6 +3,7 @@ cava/model/entity/MovimientoMaterial.class
 cava/model/service/ProveedorService.class
 cava/model/restcontroller/DevToolsController.class
 cava/model/entity/MaterialCava.class
+cava/model/restcontroller/ArchivoController.class
 cava/model/restcontroller/DeguelleController.class
 cava/model/dto/FamiliaDto.class
 cava/model/restcontroller/MovimientoMaterialController$1.class
@@ -71,6 +72,7 @@ cava/model/repository/IncidenciaRepository.class
 cava/model/service/CavaPartidaServiceImpl.class
 cava/model/repository/LogRepository.class
 cava/model/entity/Proveedor.class
+cava/model/dto/ArchivoDto.class
 cava/model/repository/UsuarioRepository.class
 cava/model/entity/Log.class
 cava/model/service/ProveedorServiceImpl.class
