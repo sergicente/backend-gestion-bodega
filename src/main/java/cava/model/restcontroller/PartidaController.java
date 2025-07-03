@@ -1,26 +1,34 @@
 package cava.model.restcontroller;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import cava.model.dto.ArchivoDto;
+import jakarta.annotation.Resource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import cava.model.dto.PartidaDto;
 import cava.model.entity.Partida;
 import cava.model.service.PartidaService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/partida")
@@ -30,6 +38,8 @@ public class PartidaController {
 	private PartidaService pservice;
 	@Autowired
 	private ModelMapper mapper;
+    @Value("${ruta-archivos}")
+    private String rutaBaseArchivos;
 	
     // Obtener todas las partidas
     @GetMapping
@@ -111,5 +121,96 @@ public class PartidaController {
 		pservice.borrar(id);
 		return ResponseEntity.noContent().build();
 	}
+
+
+    @GetMapping("/{id}/archivos")
+    public ResponseEntity<List<ArchivoDto>> listarArchivos(@PathVariable String id) {
+        Path carpeta = Paths.get(rutaBaseArchivos, "partidas", id);
+        List<ArchivoDto> archivos = new ArrayList<>();
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(carpeta)) {
+            for (Path path : stream) {
+                if (!Files.isRegularFile(path)) continue;
+
+                ArchivoDto dto = new ArchivoDto();
+                dto.setNombre(path.getFileName().toString());
+                dto.setTamano(Files.size(path));
+                dto.setTipo(Files.probeContentType(path));
+                java.nio.file.attribute.FileTime fileTime = Files.getLastModifiedTime(path);
+                java.time.Instant instant = fileTime.toInstant();
+                java.time.LocalDateTime fecha = java.time.LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault());
+                dto.setFecha(fecha);
+
+                archivos.add(dto);
+            }
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return ResponseEntity.ok(archivos);
+    }
+
+    @GetMapping("/{id}/archivos/{nombreArchivo}")
+    public ResponseEntity<Resource> descargarArchivo(
+            @PathVariable String id,
+            @PathVariable String nombreArchivo) {
+
+        try {
+            Path archivoPath = Paths.get(rutaBaseArchivos).resolve(id).resolve(nombreArchivo).normalize();
+
+            if (!archivoPath.startsWith(Paths.get(rutaBaseArchivos))) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+
+            if (!Files.exists(archivoPath) || !Files.isReadable(archivoPath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            UrlResource recurso = new UrlResource(archivoPath.toUri());
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
+                    .body((Resource) recurso);
+
+        } catch (MalformedURLException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/{id}/archivos")
+    public ResponseEntity<Map<String, String>> subirArchivos(
+            @PathVariable String id,
+            @RequestParam("archivos") List<MultipartFile> archivos) {
+
+        Map<String, String> respuesta = new HashMap<>();
+
+        try {
+            Path carpeta = Paths.get(rutaBaseArchivos, "partidas", id);
+            Files.createDirectories(carpeta);
+
+            for (MultipartFile archivo : archivos) {
+                if (archivo.isEmpty()) continue;
+
+                String nombreOriginal = archivo.getOriginalFilename();
+                if (nombreOriginal == null) continue;
+
+                Path destino = carpeta.resolve(nombreOriginal);
+
+                if (Files.exists(destino)) {
+                    respuesta.put("mensaje", "Ya existe un archivo con el nombre: " + nombreOriginal);
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(respuesta);
+                }
+
+                Files.copy(archivo.getInputStream(), destino);
+            }
+
+            respuesta.put("mensaje", "Archivos subidos correctamente");
+            return ResponseEntity.ok(respuesta);
+
+        } catch (IOException e) {
+            respuesta.put("mensaje", "Error al guardar archivos: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+        }
+    }
 	
 }
