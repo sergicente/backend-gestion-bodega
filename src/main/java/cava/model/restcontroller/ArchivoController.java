@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -74,13 +75,19 @@ public class ArchivoController {
             }
 
             UrlResource recurso = new UrlResource(archivoPath.toUri());
-
+            String contentType = Files.probeContentType(archivoPath); // Detecta tipo MIME
+            if (contentType == null) {
+                contentType = "application/octet-stream"; // por si no lo detecta
+            }
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + recurso.getFilename() + "\"")
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + recurso.getFilename() + "\"")
                     .body((Resource) recurso);
 
         } catch (MalformedURLException e) {
             return ResponseEntity.internalServerError().build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -125,11 +132,22 @@ public class ArchivoController {
                 String nombreOriginal = archivo.getOriginalFilename();
                 if (nombreOriginal == null) continue;
 
-                Path destino = carpeta.resolve(nombreOriginal);
+                String nombreSinExtension = nombreOriginal;
+                String extension = "";
 
-                if (Files.exists(destino)) {
-                    respuesta.put("mensaje", "Ya existe un archivo con el nombre: " + nombreOriginal);
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body(respuesta);
+                int punto = nombreOriginal.lastIndexOf('.');
+                if (punto != -1) {
+                    nombreSinExtension = nombreOriginal.substring(0, punto);
+                    extension = nombreOriginal.substring(punto);
+                }
+
+                Path destino = carpeta.resolve(nombreOriginal);
+                int contador = 2;
+
+                while (Files.exists(destino)) {
+                    String nuevoNombre = nombreSinExtension + "-" + contador + extension;
+                    destino = carpeta.resolve(nuevoNombre);
+                    contador++;
                 }
 
                 Files.copy(archivo.getInputStream(), destino);
