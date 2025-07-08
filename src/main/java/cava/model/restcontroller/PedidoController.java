@@ -1,0 +1,200 @@
+package cava.model.restcontroller;
+
+import cava.model.dto.*;
+import cava.model.entity.*;
+import cava.model.service.CavaService;
+import cava.model.service.FamiliaService;
+import cava.model.service.MaterialService;
+import cava.model.service.PedidoService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/pedido")
+public class PedidoController {
+	
+	@Autowired
+	private FamiliaService fservice;
+	@Autowired
+	private MaterialService mservice;
+	@Autowired
+	private CavaService cservice;
+	@Autowired
+	private ModelMapper mapper;
+    @Autowired
+    private PedidoService pservice;
+	
+    // Obtener todas las partidas
+    @GetMapping
+    public ResponseEntity<?> obtenerTodos() {
+        List<Pedido> pedidos = pservice.buscarTodos();
+        List<PedidoDto> listado = new ArrayList<>();
+
+        for (Pedido p : pedidos) {
+            listado.add(mapper.map(p, PedidoDto.class));
+        }
+
+        return ResponseEntity.ok(listado);
+    }
+    
+    
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerUno(@PathVariable long id) {
+    	Pedido pedido = pservice.buscar(id);
+    	if(pedido == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra el pedido");
+    	}else {
+    		PedidoDto dto = mapper.map(pedido, PedidoDto.class);
+    		return ResponseEntity.ok(dto);
+    	}
+    }
+    
+    
+    
+    @PostMapping("/insertar")
+    public ResponseEntity<?> insertarUno(@RequestBody PedidoDto dto) {
+
+        Pedido pedido = convertirDtoAPedido(dto);
+
+        // Guardar
+        Pedido guardado = pservice.insertar(pedido);
+
+        // Convertir a DTO de respuesta
+        PedidoDto nuevoDto = new PedidoDto();
+        nuevoDto.setId(guardado.getId());
+        nuevoDto.setCliente(guardado.getCliente());
+        nuevoDto.setEstado(guardado.getEstado());
+        nuevoDto.setFechaCreacion(guardado.getFechaCreacion());
+
+        nuevoDto.setLineas(convertirLineasAPedidoDto(guardado.getLineas()));
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
+    }
+
+
+    
+    
+    @PutMapping("/modificar/{id}")
+    public ResponseEntity<PedidoDto> modificar(@PathVariable Long id, @RequestBody PedidoDto dto) {
+        Pedido pedidoExistente = pservice.buscar(id);
+        if (pedidoExistente == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+// Actualiza campos generales
+        pedidoExistente.setCliente(dto.getCliente());
+        pedidoExistente.setEstado(dto.getEstado());
+        pedidoExistente.setFechaCreacion(dto.getFechaCreacion());
+        pedidoExistente.setObservacionesGenerales(dto.getObservacionesGenerales());
+
+// Elimina las líneas antiguas y añade las nuevas correctamente
+        pedidoExistente.getLineas().clear();
+        for (LineaPedidoDto lineaDto : dto.getLineas()) {
+            LineaPedido lp = new LineaPedido();
+            lp.setBotellas(lineaDto.getBotellas());
+            lp.setCava(lineaDto.getCava());
+            lp.setLote(lineaDto.getLote());
+            lp.setNumeroPalet(lineaDto.getNumeroPalet());
+            lp.setObservaciones(lineaDto.getObservaciones());
+            lp.setPedido(pedidoExistente); // ⬅️ esto es CRUCIAL
+            pedidoExistente.getLineas().add(lp);
+        }
+
+// Guarda
+        Pedido actualizado = pservice.insertar(pedidoExistente);
+
+// Devuelve la respuesta
+        return ResponseEntity.ok(convertirAPedidoDto(actualizado));
+    }
+
+    
+    @DeleteMapping("/borrar/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        Pedido existente = pservice.buscar(id);
+        if (existente == null) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            fservice.borrar(id);
+            return ResponseEntity.ok().body(Map.of("mensaje", "Pedido eliminado correctamente"));
+        } catch (DataIntegrityViolationException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("error", "No se puede eliminar el pedido porque está en uso"));
+        }
+    }
+
+
+
+    private List<LineaPedidoDto> convertirLineasAPedidoDto(List<LineaPedido> lineas) {
+        List<LineaPedidoDto> lista = new ArrayList<>();
+        for (LineaPedido lp : lineas) {
+            LineaPedidoDto dto = new LineaPedidoDto();
+            dto.setId(lp.getId());
+            dto.setCava(lp.getCava());
+            dto.setBotellas(lp.getBotellas());
+            dto.setObservaciones(lp.getObservaciones());
+            dto.setLote(lp.getLote());
+            dto.setNumeroPalet(lp.getNumeroPalet());
+            lista.add(dto);
+        }
+        return lista;
+    }
+
+    private Pedido convertirDtoAPedido(PedidoDto dto) {
+        Pedido pedido = new Pedido();
+        pedido.setId(dto.getId());
+        pedido.setCliente(dto.getCliente());
+        pedido.setEstado(dto.getEstado());
+        pedido.setFechaCreacion(dto.getFechaCreacion());
+
+        List<LineaPedido> lineas = new ArrayList<>();
+        if (dto.getLineas() != null) {
+            for (LineaPedidoDto lineaDto : dto.getLineas()) {
+                LineaPedido linea = new LineaPedido();
+                linea.setCava(lineaDto.getCava());
+                linea.setBotellas(lineaDto.getBotellas());
+                linea.setObservaciones(lineaDto.getObservaciones());
+                linea.setLote(lineaDto.getLote());
+                linea.setNumeroPalet(lineaDto.getNumeroPalet());
+                linea.setPedido(pedido);
+                lineas.add(linea);
+            }
+        }
+        pedido.setLineas(lineas);
+
+        return pedido;
+    }
+
+    private PedidoDto convertirAPedidoDto(Pedido pedido) {
+        PedidoDto dto = new PedidoDto();
+        dto.setId(pedido.getId());
+        dto.setCliente(pedido.getCliente());
+        dto.setEstado(pedido.getEstado());
+        dto.setFechaCreacion(pedido.getFechaCreacion());
+        dto.setObservacionesGenerales(pedido.getObservacionesGenerales());
+
+        List<LineaPedidoDto> lineasDto = new ArrayList<>();
+        for (LineaPedido lp : pedido.getLineas()) {
+            LineaPedidoDto lpDto = new LineaPedidoDto();
+            lpDto.setId(lp.getId());
+            lpDto.setBotellas(lp.getBotellas());
+            lpDto.setCava(lp.getCava());
+            lpDto.setLote(lp.getLote());
+            lpDto.setNumeroPalet(lp.getNumeroPalet());
+            lpDto.setObservaciones(lp.getObservaciones());
+            lineasDto.add(lpDto);
+        }
+        dto.setLineas(lineasDto);
+        return dto;
+    }
+
+}
