@@ -19,6 +19,7 @@ public class Pedido {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String cliente;
+    @Column(name = "observaciones_generales", length = 5000)
     private String observacionesGenerales;
     private LocalDate fechaCreacion;
     private String estado;

@@ -124,7 +124,7 @@ public class PedidoController {
             return ResponseEntity.notFound().build();
         }
         try {
-            fservice.borrar(id);
+            pservice.borrar(id);
             return ResponseEntity.ok().body(Map.of("mensaje", "Pedido eliminado correctamente"));
         } catch (DataIntegrityViolationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)

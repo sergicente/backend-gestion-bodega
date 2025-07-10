@@ -18,12 +18,14 @@ cava/model/service/CategoriaService.class
 cava/model/dto/CavaPartidaDto.class
 cava/model/entity/CosteCrianza.class
 cava/model/service/DashboardServiceImpl.class
+cava/model/service/PedidoService.class
 cava/model/repository/MaterialRepository.class
 cava/model/service/VentaServiceImpl.class
 cava/model/service/CavaService.class
 cava/model/service/MaterialCavaServiceImpl.class
 cava/model/service/IncidenciaServiceImpl.class
 cava/model/dto/LoginResponse.class
+cava/model/service/PedidoServiceImpl.class
 cava/model/service/UsuarioDetailsService.class
 cava/model/dto/LoginRequest.class
 cava/model/entity/Trimestre.class
@@ -45,6 +47,7 @@ cava/ServletInitializer.class
 cava/model/service/CosteFijoBotellaServiceImpl.class
 cava/model/restcontroller/CosteFijoBotellaController.class
 cava/model/dto/ResumenDeguellesDto.class
+cava/model/repository/PedidoRepository.class
 cava/model/dto/CategoriaDto.class
 cava/model/service/CavaPartidaService.class
 cava/model/service/MaterialCavaService.class
@@ -62,6 +65,7 @@ cava/model/entity/Incidencia.class
 cava/model/restcontroller/PartidaController.class
 cava/model/entity/TipoIncidencia.class
 cava/model/service/MaterialService.class
+cava/model/entity/Pedido.class
 cava/model/dto/MaterialCavaDto.class
 cava/model/entity/TipoMaterial.class
 cava/model/dto/DashboardGraficoCavasDto.class
@@ -74,6 +78,8 @@ cava/model/repository/LogRepository.class
 cava/model/entity/Proveedor.class
 cava/model/dto/ArchivoDto.class
 cava/model/repository/UsuarioRepository.class
+cava/model/entity/LineaPedido.class
+cava/model/dto/PedidoDto.class
 cava/model/entity/Log.class
 cava/model/service/ProveedorServiceImpl.class
 cava/configuration/SeguridadConfig.class
@@ -105,6 +111,7 @@ cava/model/service/LogServiceImpl.class
 cava/model/dto/MaterialDto.class
 cava/model/entity/Cava.class
 cava/model/service/FamiliaServiceImpl.class
+cava/model/dto/LineaPedidoDto.class
 cava/model/dto/VentaDto.class
 cava/MonastellApplication.class
 cava/model/entity/Deguelle.class
@@ -121,5 +128,6 @@ cava/model/repository/CategoriaRepository.class
 cava/model/restcontroller/CategoriaController.class
 cava/model/restcontroller/AuthController.class
 cava/model/entity/CavaPartida.class
+cava/model/restcontroller/PedidoController.class
 cava/model/restcontroller/ProveedorController.class
 cava/model/service/MovimientoMaterialService.class

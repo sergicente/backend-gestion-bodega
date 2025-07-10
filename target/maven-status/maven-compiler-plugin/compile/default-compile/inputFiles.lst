@@ -14,6 +14,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/DeguelleDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/FamiliaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/IncidenciaDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LineaPedidoDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LogDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LoginRequest.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/LoginResponse.java
@@ -21,6 +22,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/MaterialDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/MovimientoMaterialDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/PartidaDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/PedidoDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ProveedorDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ResumenDeguellesDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/VentaDto.java
@@ -34,11 +36,13 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Deguelle.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Familia.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Incidencia.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/LineaPedido.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Log.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Material.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/MaterialCava.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/MovimientoMaterial.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Partida.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Pedido.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Proveedor.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Rol.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/TipoIncidencia.java
@@ -61,6 +65,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/MaterialRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/MovimientoMaterialRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/PartidaRepository.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/PedidoRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/ProveedorRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/UsuarioRepository.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/repository/VentaRepository.java
@@ -82,6 +87,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/MaterialController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/MovimientoMaterialController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/PartidaController.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/PedidoController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/ProveedorController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/restcontroller/VentaController.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/CategoriaService.java
@@ -115,6 +121,8 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/MovimientoMaterialServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/PartidaService.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/PartidaServiceImpl.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/PedidoService.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/PedidoServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/ProveedorService.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/ProveedorServiceImpl.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/service/ResetService.java
