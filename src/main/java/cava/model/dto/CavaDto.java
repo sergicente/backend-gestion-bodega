@@ -15,6 +15,8 @@ public class CavaDto {
     private String nombre;
     private String familiaId;
     private String familiaNombre;
+    private String calificacion;
+    private String tipo;
     private boolean ecologico;
     private PartidaDto partidaActual;
     private List<CavaPartidaDto> partidasRelacionadas;

@@ -22,8 +22,9 @@ public class Pedido {
     @Column(name = "observaciones_generales", length = 5000)
     private String observacionesGenerales;
     private LocalDate fechaCreacion;
+    private LocalDate fechaLimite;
     private String estado;
-
+    private boolean urgente;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LineaPedido> lineas = new ArrayList<>();
 }

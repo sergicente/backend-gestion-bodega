@@ -15,6 +15,8 @@ public class PedidoDto {
 	private String cliente;
 	private String observacionesGenerales;
 	private LocalDate fechaCreacion;
+	private LocalDate fechaLimite;
 	private String estado;
+	private boolean urgente;
 	private List<LineaPedidoDto> lineas;
 }

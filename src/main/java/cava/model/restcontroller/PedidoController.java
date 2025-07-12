@@ -73,6 +73,8 @@ public class PedidoController {
         nuevoDto.setId(guardado.getId());
         nuevoDto.setCliente(guardado.getCliente());
         nuevoDto.setEstado(guardado.getEstado());
+        nuevoDto.setUrgente(guardado.isUrgente());
+        nuevoDto.setFechaLimite(guardado.getFechaLimite());
         nuevoDto.setFechaCreacion(guardado.getFechaCreacion());
 
         nuevoDto.setLineas(convertirLineasAPedidoDto(guardado.getLineas()));
@@ -94,6 +96,8 @@ public class PedidoController {
         pedidoExistente.setCliente(dto.getCliente());
         pedidoExistente.setEstado(dto.getEstado());
         pedidoExistente.setFechaCreacion(dto.getFechaCreacion());
+        pedidoExistente.setFechaLimite(dto.getFechaLimite());
+        pedidoExistente.setUrgente(dto.isUrgente());
         pedidoExistente.setObservacionesGenerales(dto.getObservacionesGenerales());
 
 // Elimina las líneas antiguas y añade las nuevas correctamente

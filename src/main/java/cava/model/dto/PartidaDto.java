@@ -24,6 +24,8 @@ public class PartidaDto {
     private String variedad2;
     private String variedad3;
     private String variedad4;
+    private String calificacion;
+    private String tipo;
     private double costeBotella;
 
 }

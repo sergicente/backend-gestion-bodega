@@ -1,7 +1,6 @@
 cava/model/restcontroller/CavaPartidaController.class
 cava/model/entity/MovimientoMaterial.class
 cava/model/service/ProveedorService.class
-cava/model/restcontroller/DevToolsController.class
 cava/model/entity/MaterialCava.class
 cava/model/restcontroller/ArchivoController.class
 cava/model/restcontroller/DeguelleController.class
@@ -11,7 +10,6 @@ cava/model/dto/ProveedorDto.class
 cava/model/repository/CavaPartidaRepository.class
 cava/configuration/JwtFilter.class
 cava/model/service/DeguelleService.class
-cava/model/service/ResetService.class
 cava/model/service/CategoriaServiceImpl.class
 cava/model/entity/Partida.class
 cava/model/service/CategoriaService.class

@@ -24,6 +24,9 @@ public class Cava {
     private String nombre;
     
     private boolean ecologico;
+
+    private String calificacion;
+    private String tipo;
     
     @ManyToOne
     @JoinColumn(name = "familia_id", nullable = false)
