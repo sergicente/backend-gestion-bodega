@@ -23,6 +23,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/MovimientoMaterialDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/PartidaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/PedidoDto.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/PedidoTareaDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ProveedorDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/ResumenDeguellesDto.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/dto/VentaDto.java
@@ -43,6 +44,7 @@
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/MovimientoMaterial.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Partida.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Pedido.java
+/Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/PedidoTarea.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Proveedor.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/Rol.java
 /Users/sergicentellas/Developer/java/Monastell/src/main/java/cava/model/entity/TipoIncidencia.java

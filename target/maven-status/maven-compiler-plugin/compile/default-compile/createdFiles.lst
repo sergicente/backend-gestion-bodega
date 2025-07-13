@@ -20,6 +20,7 @@ cava/model/service/PedidoService.class
 cava/model/repository/MaterialRepository.class
 cava/model/service/VentaServiceImpl.class
 cava/model/service/CavaService.class
+cava/model/dto/PedidoTareaDto.class
 cava/model/service/MaterialCavaServiceImpl.class
 cava/model/service/IncidenciaServiceImpl.class
 cava/model/dto/LoginResponse.class
@@ -38,6 +39,7 @@ cava/model/restcontroller/MovimientoMaterialController.class
 cava/model/repository/CavaRepository.class
 cava/model/entity/Venta.class
 cava/model/restcontroller/DashboardController.class
+cava/model/entity/PedidoTarea.class
 cava/model/restcontroller/CavaController.class
 cava/model/repository/VentaRepository.class
 cava/model/service/CosteCrianzaService.class

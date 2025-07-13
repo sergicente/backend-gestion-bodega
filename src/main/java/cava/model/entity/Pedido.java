@@ -24,7 +24,13 @@ public class Pedido {
     private LocalDate fechaCreacion;
     private LocalDate fechaLimite;
     private String estado;
+    private String nota1;
+    private String nota2;
+    private boolean gls;
     private boolean urgente;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LineaPedido> lineas = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PedidoTarea> tareas = new ArrayList<>();
 }

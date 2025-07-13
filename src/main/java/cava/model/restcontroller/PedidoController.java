@@ -76,9 +76,11 @@ public class PedidoController {
         nuevoDto.setUrgente(guardado.isUrgente());
         nuevoDto.setFechaLimite(guardado.getFechaLimite());
         nuevoDto.setFechaCreacion(guardado.getFechaCreacion());
-
+        nuevoDto.setGls(guardado.isGls());
+        nuevoDto.setNota1(guardado.getNota1());
+        nuevoDto.setNota2(guardado.getNota2());
         nuevoDto.setLineas(convertirLineasAPedidoDto(guardado.getLineas()));
-
+        nuevoDto.setTareas(convertirTareasAPedidoDto(guardado.getTareas()));
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoDto);
     }
 
@@ -92,15 +94,18 @@ public class PedidoController {
             return ResponseEntity.notFound().build();
         }
 
-// Actualiza campos generales
+        // Actualiza campos generales
         pedidoExistente.setCliente(dto.getCliente());
         pedidoExistente.setEstado(dto.getEstado());
         pedidoExistente.setFechaCreacion(dto.getFechaCreacion());
         pedidoExistente.setFechaLimite(dto.getFechaLimite());
         pedidoExistente.setUrgente(dto.isUrgente());
         pedidoExistente.setObservacionesGenerales(dto.getObservacionesGenerales());
+        pedidoExistente.setNota1(dto.getNota1());
+        pedidoExistente.setNota2(dto.getNota2());
+        pedidoExistente.setGls(dto.isGls());
 
-// Elimina las líneas antiguas y añade las nuevas correctamente
+        // Elimina las líneas antiguas y añade las nuevas correctamente
         pedidoExistente.getLineas().clear();
         for (LineaPedidoDto lineaDto : dto.getLineas()) {
             LineaPedido lp = new LineaPedido();
@@ -113,10 +118,21 @@ public class PedidoController {
             pedidoExistente.getLineas().add(lp);
         }
 
-// Guarda
+        // Elimina las tareas antiguas y añade las nuevas
+        pedidoExistente.getTareas().clear();
+        if (dto.getTareas() != null) {
+            for (PedidoTareaDto tareaDto : dto.getTareas()) {
+                PedidoTarea tarea = new PedidoTarea();
+                tarea.setTexto(tareaDto.getTexto());
+                tarea.setCompletado(tareaDto.isCompletado());
+                pedidoExistente.getTareas().add(tarea);
+            }
+        }
+
+        // Guarda
         Pedido actualizado = pservice.insertar(pedidoExistente);
 
-// Devuelve la respuesta
+        // Devuelve la respuesta
         return ResponseEntity.ok(convertirAPedidoDto(actualizado));
     }
 
@@ -153,13 +169,29 @@ public class PedidoController {
         return lista;
     }
 
+    private List<PedidoTareaDto> convertirTareasAPedidoDto(List<PedidoTarea> tareas) {
+        List<PedidoTareaDto> lista = new ArrayList<>();
+        for (PedidoTarea tarea : tareas) {
+            PedidoTareaDto dto = new PedidoTareaDto();
+            dto.setId(tarea.getId());
+            dto.setTexto(tarea.getTexto());
+            dto.setCompletado(tarea.isCompletado());
+            lista.add(dto);
+        }
+        return lista;
+    }
+
     private Pedido convertirDtoAPedido(PedidoDto dto) {
         Pedido pedido = new Pedido();
         pedido.setId(dto.getId());
         pedido.setCliente(dto.getCliente());
         pedido.setEstado(dto.getEstado());
         pedido.setFechaCreacion(dto.getFechaCreacion());
-
+        pedido.setFechaLimite(dto.getFechaLimite());
+        pedido.setUrgente(dto.isUrgente());
+        pedido.setGls(dto.isGls());
+        pedido.setNota1(dto.getNota1());
+        pedido.setNota2(dto.getNota2());
         List<LineaPedido> lineas = new ArrayList<>();
         if (dto.getLineas() != null) {
             for (LineaPedidoDto lineaDto : dto.getLineas()) {
@@ -174,7 +206,16 @@ public class PedidoController {
             }
         }
         pedido.setLineas(lineas);
-
+        List<PedidoTarea> tareas = new ArrayList<>();
+        if (dto.getTareas() != null){
+            for(PedidoTareaDto tareaDto : dto.getTareas()){
+                PedidoTarea tarea = new PedidoTarea();
+                tarea.setCompletado(tareaDto.isCompletado());
+                tarea.setTexto(tareaDto.getTexto());
+                tareas.add(tarea);
+            }
+        }
+        pedido.setTareas(tareas);
         return pedido;
     }
 
@@ -184,7 +225,12 @@ public class PedidoController {
         dto.setCliente(pedido.getCliente());
         dto.setEstado(pedido.getEstado());
         dto.setFechaCreacion(pedido.getFechaCreacion());
+        dto.setFechaLimite(pedido.getFechaLimite());
         dto.setObservacionesGenerales(pedido.getObservacionesGenerales());
+        dto.setNota1(pedido.getNota1());
+        dto.setNota2(pedido.getNota2());
+        dto.setUrgente(pedido.isUrgente());
+        dto.setGls(pedido.isGls());
 
         List<LineaPedidoDto> lineasDto = new ArrayList<>();
         for (LineaPedido lp : pedido.getLineas()) {
@@ -198,6 +244,19 @@ public class PedidoController {
             lineasDto.add(lpDto);
         }
         dto.setLineas(lineasDto);
+
+        List<PedidoTareaDto> tareasDto = new ArrayList<>();
+        if (pedido.getTareas() != null) {
+            for (PedidoTarea tarea : pedido.getTareas()) {
+                PedidoTareaDto tareaDto = new PedidoTareaDto();
+                tareaDto.setId(tarea.getId());
+                tareaDto.setTexto(tarea.getTexto());
+                tareaDto.setCompletado(tarea.isCompletado());
+                tareasDto.add(tareaDto);
+            }
+        }
+        dto.setTareas(tareasDto);
+
         return dto;
     }
 
