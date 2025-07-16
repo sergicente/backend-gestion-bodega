@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -123,7 +122,7 @@ public class PartidaController {
 
     @GetMapping("/{id}/archivos")
     public ResponseEntity<List<ArchivoDto>> listarArchivos(@PathVariable String id) {
-        Path carpeta = Paths.get(rutaBaseArchivos, "partidas", id);
+        Path carpeta = Path.of(rutaBaseArchivos, "partidas", id);
         List<ArchivoDto> archivos = new ArrayList<>();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(carpeta)) {
@@ -154,9 +153,9 @@ public class PartidaController {
             @PathVariable String nombreArchivo) {
 
         try {
-            Path archivoPath = Paths.get(rutaBaseArchivos).resolve(id).resolve(nombreArchivo).normalize();
+            Path archivoPath = Path.of(rutaBaseArchivos).resolve(id).resolve(nombreArchivo).normalize();
 
-            if (!archivoPath.startsWith(Paths.get(rutaBaseArchivos))) {
+            if (!archivoPath.startsWith(Path.of(rutaBaseArchivos))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -178,12 +177,12 @@ public class PartidaController {
     @PostMapping("/{id}/archivos")
     public ResponseEntity<Map<String, String>> subirArchivos(
             @PathVariable String id,
-            @RequestParam("archivos") List<MultipartFile> archivos) {
+            @RequestParam List<MultipartFile> archivos) {
 
         Map<String, String> respuesta = new HashMap<>();
 
         try {
-            Path carpeta = Paths.get(rutaBaseArchivos, "partidas", id);
+            Path carpeta = Path.of(rutaBaseArchivos, "partidas", id);
             Files.createDirectories(carpeta);
 
             for (MultipartFile archivo : archivos) {

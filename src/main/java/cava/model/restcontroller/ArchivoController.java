@@ -16,7 +16,6 @@ import java.net.MalformedURLException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -31,7 +30,7 @@ public class ArchivoController {
 
     @GetMapping("/{tipo}/{id}")
     public ResponseEntity<List<ArchivoDto>> listarArchivos(@PathVariable String tipo, @PathVariable String id) {
-        Path carpeta = Paths.get(rutaBaseArchivos, tipo, id);
+        Path carpeta = Path.of(rutaBaseArchivos, tipo, id);
         if (!Files.exists(carpeta)) {
             return ResponseEntity.ok(Collections.emptyList());
         }
@@ -61,9 +60,9 @@ public class ArchivoController {
             @PathVariable String nombreArchivo) {
 
         try {
-            Path archivoPath = Paths.get(rutaBaseArchivos, tipo, id, nombreArchivo).normalize();
+            Path archivoPath = Path.of(rutaBaseArchivos, tipo, id, nombreArchivo).normalize();
 
-            if (!archivoPath.startsWith(Paths.get(rutaBaseArchivos))) {
+            if (!archivoPath.startsWith(Path.of(rutaBaseArchivos))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -93,9 +92,9 @@ public class ArchivoController {
                                                 @PathVariable String id,
                                                 @PathVariable String nombreArchivo) {
         try {
-            Path archivoPath = Paths.get(rutaBaseArchivos, tipo, id, nombreArchivo).normalize();
+            Path archivoPath = Path.of(rutaBaseArchivos, tipo, id, nombreArchivo).normalize();
 
-            if (!archivoPath.startsWith(Paths.get(rutaBaseArchivos))) {
+            if (!archivoPath.startsWith(Path.of(rutaBaseArchivos))) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -115,12 +114,12 @@ public class ArchivoController {
     @PostMapping("/{tipo}/{id}")
     public ResponseEntity<Map<String, String>> subirArchivos(@PathVariable String tipo,
             @PathVariable String id,
-            @RequestParam("archivos") List<MultipartFile> archivos) {
+            @RequestParam List<MultipartFile> archivos) {
 
         Map<String, String> respuesta = new HashMap<>();
 
         try {
-            Path carpeta = Paths.get(rutaBaseArchivos, tipo, id);
+            Path carpeta = Path.of(rutaBaseArchivos, tipo, id);
             Files.createDirectories(carpeta);
 
             for (MultipartFile archivo : archivos) {
