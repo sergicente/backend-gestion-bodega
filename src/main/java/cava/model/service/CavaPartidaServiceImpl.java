@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cava.model.entity.CavaPartida;
-import cava.model.entity.Partida;
 import cava.model.repository.CavaPartidaRepository;
-import cava.model.repository.PartidaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -26,7 +24,6 @@ public class CavaPartidaServiceImpl implements CavaPartidaService{
 
 	@Override
 	public List<CavaPartida> buscarTodos() {
-		// TODO Auto-generated method stub
 		return prepo.findAll();
 	}
 

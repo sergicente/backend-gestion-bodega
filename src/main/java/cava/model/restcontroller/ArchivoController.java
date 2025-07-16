@@ -2,8 +2,6 @@ package cava.model.restcontroller;
 
 import cava.model.dto.ArchivoDto;
 import org.springframework.core.io.Resource;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -26,8 +24,7 @@ import java.util.*;
 @RequestMapping("/api/archivos")
 public class ArchivoController {
 	
-	@Autowired
-	private ModelMapper mapper;
+
     @Value("${ruta-archivos}")
     private String rutaBaseArchivos;
 

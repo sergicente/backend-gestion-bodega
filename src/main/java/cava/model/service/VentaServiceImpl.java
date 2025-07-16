@@ -4,10 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cava.model.entity.Partida;
 import cava.model.entity.Venta;
-import cava.model.repository.PartidaRepository;
 import cava.model.repository.VentaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
@@ -25,7 +22,6 @@ public class VentaServiceImpl implements VentaService{
 
 	@Override
 	public List<Venta> buscarTodos() {
-		// TODO Auto-generated method stub
 		return vrepo.findAll();
 	}
 

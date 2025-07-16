@@ -1,6 +1,5 @@
 package cava.model.service;
 
-import cava.model.entity.Familia;
 import cava.model.entity.Log;
 import cava.model.repository.LogRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,7 +22,6 @@ public class LogServiceImpl implements LogService{
 
 	@Override
 	public List<Log> buscarTodos() {
-		// TODO Auto-generated method stub
 		return lrepo.findAll();
 	}
 

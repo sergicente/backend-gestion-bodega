@@ -13,13 +13,14 @@ import java.util.TreeMap;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Service
-public class DashboardServiceImpl implements DashboardService{
-
+public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	private PartidaRepository pRepo;
@@ -40,35 +41,39 @@ public class DashboardServiceImpl implements DashboardService{
 
 	@Override
 	public ResumenDeguellesDto obtenerResumenMensualDeguellades() {
-	    LocalDateTime hoy = LocalDateTime.now();
-	    LocalDateTime hace12Meses = hoy.minusMonths(11).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
-	    List<Deguelle> deguelles = dRepo.findByFechaBetween(hace12Meses, hoy);
+		LocalDateTime hoy = LocalDateTime.now();
+		LocalDateTime hace12Meses = hoy.minusMonths(11).withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+		List<Deguelle> deguelles = dRepo.findByFechaBetween(hace12Meses, hoy);
 
-	    TreeMap<YearMonth, Integer> resumenPorMes = new TreeMap<>();
-	    YearMonth inicio = YearMonth.from(hace12Meses);
-	    for (int i = 0; i < 12; i++) {
-	        resumenPorMes.put(inicio.plusMonths(i), 0);
-	    }
+		TreeMap<YearMonth, Integer> resumenPorMes = new TreeMap<>();
+		YearMonth inicio = YearMonth.from(hace12Meses);
+		for (int i = 0; i < 12; i++) {
+			resumenPorMes.put(inicio.plusMonths(i), 0);
+		}
 
-	    for (Deguelle d : deguelles) {
-	        YearMonth ym = YearMonth.from(d.getFecha());
-	        if (resumenPorMes.containsKey(ym)) {
-                resumenPorMes.compute(ym, (k, cantidadActual) -> cantidadActual + d.getCantidad());
-	        } else {
-	            resumenPorMes.put(ym, d.getCantidad());
-	        }
-	    }
+		for (Deguelle d : deguelles) {
+			YearMonth ym = YearMonth.from(d.getFecha());
+			if (resumenPorMes.containsKey(ym)) {
+				resumenPorMes.compute(ym, (k, cantidadActual) -> cantidadActual + d.getCantidad());
+			} else {
+				resumenPorMes.put(ym, d.getCantidad());
+			}
+		}
 
-	    List<String> meses = new java.util.ArrayList<>();
-	    List<Integer> cantidades = new java.util.ArrayList<>();
-	    for (Map.Entry<YearMonth, Integer> entry : resumenPorMes.entrySet()) {
-	        YearMonth ym = entry.getKey();
-	        int cantidad = entry.getValue();
-	        meses.add(ym.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, new java.util.Locale("es")));
-	        cantidades.add(cantidad);
-	    }
+		List<String> meses = new java.util.ArrayList<>();
+		List<Integer> cantidades = new java.util.ArrayList<>();
+		for (Map.Entry<YearMonth, Integer> entry : resumenPorMes.entrySet()) {
+			YearMonth ym = entry.getKey();
+			int cantidad = entry.getValue();
+			meses.add(
+					ym.getMonth().getDisplayName(
+							TextStyle.SHORT,
+							Locale.forLanguageTag("es")
+					));
+			cantidades.add(cantidad);
+		}
 
-	    return new ResumenDeguellesDto(meses, cantidades);
+		return new ResumenDeguellesDto(meses, cantidades);
 	}
 
 	private double calcularCrianzaMedia() {
@@ -80,7 +85,8 @@ public class DashboardServiceImpl implements DashboardService{
 
 		for (Partida p : partidas) {
 			int botellasRima = p.getBotellasRima();
-			if (botellasRima <= 0) continue; // Saltamos partidas sin botellas en rima
+			if (botellasRima <= 0)
+				continue; // Saltamos partidas sin botellas en rima
 
 			long dies = ChronoUnit.DAYS.between(p.getFechaEmbotellado(), avui);
 			double mesos = dies / 30.44;
@@ -89,35 +95,38 @@ public class DashboardServiceImpl implements DashboardService{
 			totalBotellasRima += botellasRima;
 		}
 
-		if (totalBotellasRima == 0) return 0.0;
+		if (totalBotellasRima == 0)
+			return 0.0;
 
 		return sumaPonderada / totalBotellasRima;
 	}
 
 	private int calcularEmbotellada() {
 		int anyActual = LocalDate.now().getYear();
-		LocalDate inicioAnyo = LocalDate.of(anyActual -1, 6, 1);
+		LocalDate inicioAnyo = LocalDate.of(anyActual - 1, 6, 1);
 		LocalDate hoy = LocalDate.of(anyActual, 6, 1);
 
 		List<Partida> embotellada = pRepo.findByFechaEmbotelladoBetween(inicioAnyo, hoy);
 
 		int totalProduccio = 0;
-		for(Partida p: embotellada){
-			totalProduccio += p.getBotellasMerma()+p.getBotellasRima()+p.getBotellasStock()+p.getBotellasVendidas();
+		for (Partida p : embotellada) {
+			totalProduccio += p.getBotellasMerma() + p.getBotellasRima() + p.getBotellasStock()
+					+ p.getBotellasVendidas();
 		}
 		return totalProduccio;
 	}
 
 	private int calcularEmbotelladaPasada() {
 		int anyActual = LocalDate.now().getYear();
-		LocalDate inicioAnyo = LocalDate.of(anyActual -2, 6, 1);
-		LocalDate hoy = LocalDate.of(anyActual-1, 6, 1);
+		LocalDate inicioAnyo = LocalDate.of(anyActual - 2, 6, 1);
+		LocalDate hoy = LocalDate.of(anyActual - 1, 6, 1);
 
 		List<Partida> embotellada = pRepo.findByFechaEmbotelladoBetween(inicioAnyo, hoy);
 
 		int totalProduccio = 0;
-		for(Partida p: embotellada){
-			totalProduccio += p.getBotellasMerma()+p.getBotellasRima()+p.getBotellasStock()+p.getBotellasVendidas();
+		for (Partida p : embotellada) {
+			totalProduccio += p.getBotellasMerma() + p.getBotellasRima() + p.getBotellasStock()
+					+ p.getBotellasVendidas();
 		}
 		return totalProduccio;
 	}
@@ -128,7 +137,7 @@ public class DashboardServiceImpl implements DashboardService{
 		LocalDateTime hoy = LocalDate.now().atTime(23, 59, 59);
 		List<Deguelle> deguelles = dRepo.findByFechaBetween(inicioAnyo, hoy);
 		int totalProduccio = 0;
-		for(Deguelle d: deguelles){
+		for (Deguelle d : deguelles) {
 			totalProduccio += d.getCantidad();
 		}
 		return totalProduccio;
@@ -149,12 +158,11 @@ public class DashboardServiceImpl implements DashboardService{
 	private int calcularTotalBotellasEnRima() {
 		int total = 0;
 		List<Partida> partidas = pRepo.findAll();
-		for(Partida p : partidas){
+		for (Partida p : partidas) {
 			total += p.getBotellasRima();
 		}
 		return total;
 	}
-
 
 	@Override
 	public List<DashboardGraficoCavasDto> obtenerDeguelladosPorCavaEsteAnyo() {

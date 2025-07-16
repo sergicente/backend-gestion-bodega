@@ -2,10 +2,8 @@ package cava.model.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import cava.model.dto.DashboardGraficoCavasDto;
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import cava.model.entity.Deguelle;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

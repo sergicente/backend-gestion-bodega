@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import cava.model.dto.CompraMaterialDto;
-import cava.model.dto.MovimientoMaterialDto;
 import cava.model.entity.CompraMaterial;
 import cava.model.entity.Material;
 import cava.model.entity.MovimientoMaterial;
@@ -20,7 +19,6 @@ import cava.model.service.CompraMaterialService;
 import cava.model.service.MaterialService;
 import cava.model.service.MovimientoMaterialService;
 import cava.model.service.ProveedorService;
-import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 
 @RestController
@@ -41,9 +39,7 @@ public class CompraMaterialController {
 
     @Autowired
     private ModelMapper mapper;
-    
-    @Autowired
-    private EntityManager entityManager;
+
 
     // Obtener todas las compras
     @GetMapping

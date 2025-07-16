@@ -1,10 +1,5 @@
 package cava.model.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
 public class DashboardGraficoCavasDto {
     private String cavaNombre;
     private Long cantidad;

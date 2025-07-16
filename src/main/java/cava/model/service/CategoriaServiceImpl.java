@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cava.model.entity.Categoria;
-import cava.model.entity.Familia;
 import cava.model.repository.CategoriaRepository;
-import cava.model.repository.FamiliaRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
@@ -25,7 +23,6 @@ public class CategoriaServiceImpl implements CategoriaService{
 
 	@Override
 	public List<Categoria> buscarTodos() {
-		// TODO Auto-generated method stub
 		return crepo.findAll();
 	}
 

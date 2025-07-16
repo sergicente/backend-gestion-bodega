@@ -2,9 +2,6 @@ package cava.model.restcontroller;
 
 import cava.model.dto.*;
 import cava.model.entity.*;
-import cava.model.service.CavaService;
-import cava.model.service.FamiliaService;
-import cava.model.service.MaterialService;
 import cava.model.service.PedidoService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +18,6 @@ import java.util.Map;
 @RequestMapping("/api/pedido")
 public class PedidoController {
 	
-	@Autowired
-	private FamiliaService fservice;
-	@Autowired
-	private MaterialService mservice;
-	@Autowired
-	private CavaService cservice;
 	@Autowired
 	private ModelMapper mapper;
     @Autowired

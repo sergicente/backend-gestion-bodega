@@ -7,7 +7,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,11 +21,8 @@ import cava.model.dto.PartidaDto;
 import cava.model.entity.Cava;
 import cava.model.entity.CavaPartida;
 import cava.model.entity.Familia;
-import cava.model.entity.Partida;
-import cava.model.service.CavaPartidaService;
 import cava.model.service.CavaService;
 import cava.model.service.FamiliaService;
-import cava.model.service.PartidaService;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
@@ -36,11 +32,7 @@ public class CavaController {
 	@Autowired
 	private CavaService cservice;
 	@Autowired
-	private PartidaService pservice;
-	@Autowired
 	private FamiliaService fservice;
-	@Autowired
-	private CavaPartidaService cpservice;
 	@Autowired
 	private ModelMapper mapper;
 	

@@ -1,8 +1,6 @@
 package cava.model.dto;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import cava.model.entity.TipoMovimientoMaterial;
 import lombok.AllArgsConstructor;
 import lombok.Data;

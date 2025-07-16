@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import cava.model.entity.CompraMaterial;
-import cava.model.entity.Familia;
-import cava.model.entity.MovimientoMaterial;
 import cava.model.repository.CompraMaterialRepository;
-import cava.model.repository.FamiliaRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 

@@ -4,15 +4,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import cava.model.entity.CompraMaterial;
-import cava.model.entity.Familia;
 import cava.model.entity.Incidencia;
-import cava.model.entity.Proveedor;
-import cava.model.repository.CompraMaterialRepository;
-import cava.model.repository.FamiliaRepository;
 import cava.model.repository.IncidenciaRepository;
-import cava.model.repository.ProveedorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
