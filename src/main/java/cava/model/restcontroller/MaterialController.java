@@ -1,9 +1,11 @@
 package cava.model.restcontroller;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import cava.model.service.CompraMaterialService;
+import cava.model.entity.*;
+import cava.model.service.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,12 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cava.model.dto.MaterialDto;
-import cava.model.entity.Categoria;
-import cava.model.entity.Familia;
-import cava.model.entity.Material;
-import cava.model.service.CategoriaService;
-import cava.model.service.FamiliaService;
-import cava.model.service.MaterialService;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
@@ -40,8 +36,10 @@ public class MaterialController {
 	private ModelMapper mapper;
     @Autowired
     private CompraMaterialService cmservice;
-
-
+    @Autowired
+    private ProveedorService pservice;
+    @Autowired
+    private MovimientoMaterialService mmservice;
     // Obtener todas las partidas
 	@GetMapping
 	public ResponseEntity<?> obtenerTodos() {
@@ -139,6 +137,8 @@ public class MaterialController {
             existente.setFamilia(familia);
             existente.setObservaciones(materialDto.getObservaciones());
             existente.setCantidad(materialDto.getCantidad());
+            existente.setCantidadMinima(materialDto.getCantidadMinima());
+            existente.setCantidadGastada(materialDto.getCantidadGastada());
 
             Material actualizado = mservice.modificar(existente);
             MaterialDto actualizadoDto = mapper.map(actualizado, MaterialDto.class);
@@ -176,6 +176,57 @@ public class MaterialController {
         }
         System.out.println("Entrando en alertas, total materiales: " + todos.size());
         return ResponseEntity.ok(alertas);
+    }
+
+
+
+    @PostMapping("/insertar-completo")
+    public ResponseEntity<?> insertarMaterialConStockYPrecio(@RequestBody MaterialDto dto) {
+        // 1. Buscar categoría y familia
+        Categoria categoria = catservice.buscar(dto.getCategoriaId());
+        Familia familia = fservice.buscar(dto.getFamiliaId());
+        if (categoria == null || familia == null) {
+            return ResponseEntity.badRequest().body("Familia o Categoría no encontrada");
+        }
+        Proveedor proveedor = null;
+        if (dto.getProveedorId() != null) {
+            proveedor = pservice.buscar(dto.getProveedorId());
+            if (proveedor == null) {
+                return ResponseEntity.badRequest().body("Proveedor no encontrado con ID " + dto.getProveedorId());
+            }
+        }
+        // 2. Crear Material
+        Material material = mapper.map(dto, Material.class);
+        material.setCategoria(categoria);
+        material.setFamilia(familia);
+        Material nuevo = mservice.insertar(material);
+
+        // 3. Crear CompraMaterial de 1 unidad al precio indicado
+        CompraMaterial compra = new CompraMaterial();
+        compra.setMaterial(nuevo);
+        compra.setFecha(LocalDateTime.of(2025, 7, 1, 0, 0));
+        compra.setProveedor(proveedor);
+        compra.setDescripcion("Inventari inicial juliol 2025");
+        compra.setPrecioUnitario(dto.getPrecioActual());
+        compra.setPrecioTotal(dto.getPrecioActual()*dto.getCantidad());
+        compra.setCantidad(dto.getCantidad());
+        CompraMaterial guardada = cmservice.insertar(compra);
+
+        // 4. Crear MovimientoMaterial con stock real
+        MovimientoMaterial mov_compra = new MovimientoMaterial();
+        mov_compra.setMaterial(nuevo);
+        mov_compra.setCantidad(dto.getCantidad());
+        mov_compra.setDescripcion("Inventari inicial juliol 2025");
+        mov_compra.setTipo(TipoMovimientoMaterial.ENTRADA);
+        mov_compra.setFecha(LocalDateTime.of(2025, 7, 1, 0, 0));
+        mov_compra.setCompraMaterial(guardada);
+        mmservice.insertar(mov_compra);
+
+
+
+
+        // 5. Devolver material DTO
+        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(nuevo, MaterialDto.class));
     }
 	
 }

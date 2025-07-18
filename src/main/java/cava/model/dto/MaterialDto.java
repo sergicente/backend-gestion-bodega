@@ -19,4 +19,5 @@ public class MaterialDto {
     private int cantidad;
     private int cantidadMinima;
     private float cantidadGastada;
+    private Long proveedorId;
 }
